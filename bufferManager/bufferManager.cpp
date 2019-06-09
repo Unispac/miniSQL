@@ -50,7 +50,7 @@ Block * bufferManager::getBlock(const string fileName, int id)
 
 		if (temp == pilarTail)
 		{
-			errorHandler->reportErrorCode(0); // error code 0 :  unexpected buffer explosion.
+			errorHandler->reportErrorCode(BUFFER_EXPLOSION); // error code 0 :  unexpected buffer explosion.
 		}
 		else
 		{
@@ -84,7 +84,7 @@ bool bufferManager::writeBlock(Block * block, const char *data)
 	FILE * file = fopen(filePath.c_str(), "rb+");
 	if (file == NULL)
 	{
-		errorHandler->reportErrorCode(2);
+		errorHandler->reportErrorCode(BLOCK_WRITING_FAIL);
 	}
 	string x;
 	fseek(file, block->id*blockSize, SEEK_SET);
@@ -100,7 +100,7 @@ Block * bufferManager::loadBlock(const string fileName,int id)
 	FILE * file = fopen(filePath.c_str(), "rb");
 	if (file == NULL)
 	{
-		errorHandler->reportErrorCode(1);
+		errorHandler->reportErrorCode(BLOCK_READING_FAIL);
 	}
 
 	fseek(file, id*blockSize, SEEK_SET);

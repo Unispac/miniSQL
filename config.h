@@ -7,6 +7,12 @@ using namespace std;
 
 #define blockSize 4096   // 4KB for each block
 #define bufferMaxSize 1024  // size of buffer cache : 4MB 
+#define DB_FLOAT 201900
+#define DB_INT 201901
+#define DB_CHAR 201902
+#define maxTableAttr 32
+#define maxCharLen 255
+
 
 
 class Block    // data structure for a single block in the main memory.
