@@ -2,7 +2,6 @@
 #include<bufferManager/bufferManager.h>
 #include<catlogManager/catalogManager.h>
 #include<fstream>
-#include<Windows.h>
 #include<table/Table.h>
 using namespace std;
 

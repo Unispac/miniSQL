@@ -25,15 +25,24 @@ struct dbDataType
 	}
 };
 
+struct tableValue
+{
+	int INT;
+	float FLOAT;
+	char* CHAR;
+};
+
 class Table
 {
 public:
 	string name;
 	int colCnt, rowCnt;
 	int primaryKey;
+	int instanceNumPerBlock;
+	int sizePerInstance;
 	vector<dbDataType*> * attrList;
 	vector<string> * attributesHaveIndex;
-	Table(string tableName, vector<dbDataType*>*attr, vector<string> * index);
+	Table(string tableName, vector<dbDataType*>*attr, vector<string> * index,int row=0);
 };
 
 #endif // !Table_H

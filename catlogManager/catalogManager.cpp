@@ -40,16 +40,18 @@ Table * catalogManager::getTable(string TableName)
 
 	vector<dbDataType*> * attr = new vector<dbDataType*>;
 	vector<string> * index = new vector<string>;
-	int dbType, n, unique, primary,hasIndex;
+	int dbType, n, unique, primary, hasIndex;
 	string name;
 	while (!infile.eof())
 	{
-		infile >> dbType >> n >> name >> unique >> primary>>hasIndex;
+		infile >> dbType >> n >> name >> unique >> primary >> hasIndex;
 		attr->push_back(new dbDataType(dbType, n, name, unique, primary,hasIndex));
 		if (hasIndex)index->push_back(name);
 	}
+	int len;
+	infile >> len;
 	infile.close();
-	return new Table(TableName, attr, index);
+	return new Table(TableName, attr, index,len);
 }
 
 bool catalogManager::createTable(string TableName,vector<dbDataType*>*attr)
@@ -93,6 +95,7 @@ bool catalogManager::createTable(string TableName,vector<dbDataType*>*attr)
 		temp = (*attr)[i];
 		outfile << temp->dbType << " " << temp->n << " " << temp->name << " " << temp->unique << " " << temp->primary << " " << temp->hasIndex << endl;
 	}
+	outfile << 0 <<endl; //rowCnt=0
 	outfile.close();
 	tableNameList.insert(TableName);
 	outfile.open("catalog/tableNameList.mdb", ios::app);
@@ -119,6 +122,24 @@ bool catalogManager::dropTable(string TableName)
 	}
 	outfile.close();
 
+	return true;
+}
+
+bool catalogManager::updateTable(Table * table)
+{
+	string tableName = table->name;
+	string filePath = "catalog/table_" + tableName+ ".mdb";
+	ofstream outfile;
+	outfile.open(filePath, ios::out);
+	int len = table->colCnt;
+	dbDataType * temp;
+	for (int i = 0; i < len; i++)
+	{
+		temp = (*(table->attrList))[i];
+		outfile << temp->dbType << " " << temp->n << " " << temp->name << " " << temp->unique << " " << temp->primary << " " << temp->hasIndex << endl;
+	}
+	outfile << table->rowCnt << endl; //rowCnt=0
+	outfile.close();
 	return true;
 }
 

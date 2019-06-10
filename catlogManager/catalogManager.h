@@ -16,6 +16,7 @@ public:
 	Table * getTable(string TableName);
 	bool createTable(string TableName, vector<dbDataType*>*attr);
 	bool dropTable(string TableName);
+	bool updateTable(Table * table);
 
 	Index * getIndex(string TableName, string attrName);
 	bool createIndex(string TableName, string attrName);

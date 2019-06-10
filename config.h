@@ -3,6 +3,7 @@
 
 #include<string>
 #include<utils/errorReporter.h>
+#include<Windows.h>
 using namespace std;
 
 #define blockSize 4096   // 4KB for each block

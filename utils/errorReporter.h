@@ -20,6 +20,7 @@ using namespace std;
 #define ILLEGAL_DATA_TYPE 11
 #define TOO_MANY_PRIMARY 12
 #define NO_TABLE_TO_DROP 13
+#define INSTANCE_TOO_LARGE 14
 
 
 class errorReporter
