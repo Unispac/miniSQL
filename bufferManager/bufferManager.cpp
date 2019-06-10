@@ -129,18 +129,19 @@ bool bufferManager::deleteNode(bufferNode* x)
 	return true;
 }
 
-Block * bufferManager::appendBlock(const string fileName)
+bool  bufferManager::appendBlock(const string fileName)
 {
-	Block * temp = getBlock(fileName, 0);
-	int blockCnt;
-	binaryFile::readInt(temp->data + 4, &blockCnt);
-	blockCnt++;
 	char* data = new char[blockSize];
 	string filePath = "data/" + fileName + ".mdb";
 	FILE *file = fopen(filePath.c_str(), "ab+");
 	fwrite(data, blockSize, 1, file);
 	fclose(file);
-	binaryFile::writeInt(temp->data + 4, blockCnt);
-	writeBlock(temp);
-	return getBlock(fileName, blockCnt);
+	delete data;
+	return true;
 }
+/*
+binaryFile::writeInt(data, 0);  //header point
+binaryFile::writeInt(data + 4, 1);// blockNumber
+binaryFile::writeInt(data + 8, 0); // quantity of records.
+binaryFile::writeInt(data + 12, -1); // max ID ever occured.
+*/

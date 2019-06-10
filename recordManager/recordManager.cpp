@@ -2,6 +2,7 @@
 #include<bufferManager/binaryFile.h>
 #include<table/tableFile.h>
 
+
 recordManager::recordManager()
 {
 	catalog = new catalogManager();
@@ -27,6 +28,7 @@ bool recordManager::createTable(string tableName)
 		binaryFile::writeInt(data + 12, -1); // max ID ever occured.
 		fwrite(data, blockSize, 1, file);
 		fclose(file);
+		delete data;
 	}
 	return true;
 }
@@ -83,4 +85,12 @@ vector<int>* recordManager::select(string tableName, vector<Logic>*)            
 bool recordManager::defragmentation(string tableName)  //碎片整理，心情好再写
 {
 	return false;
+}
+
+vector<tableValue> * recordManager::getRecordById(string tableName,int id) //只是为了debug用
+{
+	tableFile * file = new tableFile(tableName);
+	vector<tableValue> * temp = file->getRecord(id);
+	delete file;
+	return temp;
 }

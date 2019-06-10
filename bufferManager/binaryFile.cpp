@@ -3,21 +3,22 @@
 bool binaryFile::writeTableValue(char *p, vector<tableValue>* list, Table* table)
 {
 	int len = table->colCnt;
+
 	vector<dbDataType*> * typeList = table->attrList;
+
+	*p = 1;
+	p++;
+
 	for (int i = 0; i < len; i++)
 	{
-		binaryFile::writeInt(p, 1);  //标记其为一个有效的record。
-		p++;
 		switch ((*typeList)[i]->dbType)
 		{
 			case DB_INT:
-				int value = (*list)[i].INT;
-				binaryFile::writeInt(p, value);
+				binaryFile::writeInt(p, (*list)[i].INT);
 				p += 4;
 				break;
 			case DB_FLOAT:
-				float value = (*list)[i].FLOAT;
-				binaryFile::writeFloat(p, value);
+				binaryFile::writeFloat(p, (*list)[i].FLOAT);
 				p += 4;
 				break;
 			case DB_CHAR:
@@ -40,7 +41,7 @@ bool binaryFile::readTableValue(char *p, vector<tableValue>* list, Table *table)
 		switch ((*typeList)[i]->dbType)
 		{
 		case DB_INT:
-			binaryFile::readInt(p, &(temp.INT)));
+			binaryFile::readInt(p, &(temp.INT));
 			p += 4;
 			break;
 		case DB_FLOAT:

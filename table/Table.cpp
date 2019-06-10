@@ -20,9 +20,12 @@ Table::Table(string tableName, vector<dbDataType*>*attr, vector<string> * index)
 			else primaryKey = i;
 		}
 		temp = (*attrList)[i]->dbType;
-		if (temp == DB_FLOAT || temp == DB_FLOAT)sizePerInstance += 4;
+		if (temp == DB_FLOAT || temp == DB_INT)sizePerInstance += 4;
 		else if (temp == DB_CHAR)sizePerInstance += (*attrList)[i]->n;
-		else errorHandler->reportErrorCode(ILLEGAL_DATA_TYPE);
+		else
+		{
+			errorHandler->reportErrorCode(ILLEGAL_DATA_TYPE);
+		}
 	}
 	sizePerInstance += 1; // 每一个record的开头是一个标记符号，标记这是否是一个空位。
 

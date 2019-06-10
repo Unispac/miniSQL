@@ -1,5 +1,5 @@
 #ifndef binaryFile_H
-#define bianryFile_H
+#define binaryFile_H
 #include<table/Table.h>
 #include<config.h>
 #include<vector>

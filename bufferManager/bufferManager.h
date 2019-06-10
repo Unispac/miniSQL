@@ -33,7 +33,7 @@ public:
 	bool writeBlock(const string fileName, int id);
 	bool writeBlock(Block * block);
 	bool acessNode(bufferNode *node);
-	Block * appendBlock(const string fileName);
+	bool appendBlock(const string fileName);
 
 private:
 	int blockCnt;

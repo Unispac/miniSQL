@@ -13,9 +13,8 @@ catalogManager::catalogManager()
 	if (infile.fail())errorHandler->reportErrorCode(NO_TABLE_LIST);
 	
 	string temp;
-	while (!infile.eof())
+	while (infile>>temp)
 	{
-		infile >> temp;
 		tableNameList.insert(temp);
 	}
 	infile.close();
@@ -42,9 +41,9 @@ Table * catalogManager::getTable(string TableName)
 	vector<string> * index = new vector<string>;
 	int dbType, n, unique, primary, hasIndex;
 	string name;
-	while (!infile.eof())
+	while ( infile>>dbType)
 	{
-		infile >> dbType >> n >> name >> unique >> primary >> hasIndex;
+		infile >> n >> name >> unique >> primary >> hasIndex;
 		attr->push_back(new dbDataType(dbType, n, name, unique, primary,hasIndex));
 		if (hasIndex)index->push_back(name);
 	}
