@@ -30,9 +30,10 @@ public:
 	bufferManager();   
 	~bufferManager();
 	Block * getBlock(const string fileName,int id);   
-	bool writeBlock(const string fileName, int id,const char *data);
-	bool writeBlock(Block * block, const char *data);
+	bool writeBlock(const string fileName, int id);
+	bool writeBlock(Block * block);
 	bool acessNode(bufferNode *node);
+	Block * appendBlock(const string fileName);
 
 private:
 	int blockCnt;

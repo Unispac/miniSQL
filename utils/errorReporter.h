@@ -21,6 +21,7 @@ using namespace std;
 #define TOO_MANY_PRIMARY 12
 #define NO_TABLE_TO_DROP 13
 #define INSTANCE_TOO_LARGE 14
+#define RECORD_DOES_NOT_EXIST 15
 
 
 class errorReporter
@@ -44,6 +45,8 @@ public:
 		errorTemplate[11] = " * error [11] : Illigal Data Type!";
 		errorTemplate[12] = " * error [12] : Too many primary keys! Only one primary key is allowed!";
 		errorTemplate[13] = " * error [13] : Table doesn't exist, can not drop it.";
+		errorTemplate[14] = " * error [14] : Record too large!";
+		errorTemplate[15] = " * error [15] : Unexpected access to an unexisted record.";
 	}
 
 

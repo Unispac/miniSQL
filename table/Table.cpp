@@ -1,12 +1,11 @@
 #include<table/Table.h>
 extern errorReporter *errorHandler;
 
-Table::Table(string tableName, vector<dbDataType*>*attr, vector<string> * index, int row=0)
+Table::Table(string tableName, vector<dbDataType*>*attr, vector<string> * index)
 {
 	name = tableName;
 	attrList = attr;
 	attributesHaveIndex = index;
-	rowCnt = row;
 	colCnt = attr->size();
 	int i,temp;
 	primaryKey = -1;
@@ -25,6 +24,7 @@ Table::Table(string tableName, vector<dbDataType*>*attr, vector<string> * index,
 		else if (temp == DB_CHAR)sizePerInstance += (*attrList)[i]->n;
 		else errorHandler->reportErrorCode(ILLEGAL_DATA_TYPE);
 	}
+	sizePerInstance += 1; // 每一个record的开头是一个标记符号，标记这是否是一个空位。
 
 	if (sizePerInstance > blockSize)
 		errorHandler->reportErrorCode(INSTANCE_TOO_LARGE);

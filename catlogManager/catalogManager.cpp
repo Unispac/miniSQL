@@ -48,10 +48,8 @@ Table * catalogManager::getTable(string TableName)
 		attr->push_back(new dbDataType(dbType, n, name, unique, primary,hasIndex));
 		if (hasIndex)index->push_back(name);
 	}
-	int len;
-	infile >> len;
 	infile.close();
-	return new Table(TableName, attr, index,len);
+	return new Table(TableName, attr, index);
 }
 
 bool catalogManager::createTable(string TableName,vector<dbDataType*>*attr)
@@ -95,7 +93,6 @@ bool catalogManager::createTable(string TableName,vector<dbDataType*>*attr)
 		temp = (*attr)[i];
 		outfile << temp->dbType << " " << temp->n << " " << temp->name << " " << temp->unique << " " << temp->primary << " " << temp->hasIndex << endl;
 	}
-	outfile << 0 <<endl; //rowCnt=0
 	outfile.close();
 	tableNameList.insert(TableName);
 	outfile.open("catalog/tableNameList.mdb", ios::app);
@@ -125,7 +122,7 @@ bool catalogManager::dropTable(string TableName)
 	return true;
 }
 
-bool catalogManager::updateTable(Table * table)
+/*bool catalogManager::updateTable(Table * table)
 {
 	string tableName = table->name;
 	string filePath = "catalog/table_" + tableName+ ".mdb";
@@ -141,7 +138,7 @@ bool catalogManager::updateTable(Table * table)
 	outfile << table->rowCnt << endl; //rowCnt=0
 	outfile.close();
 	return true;
-}
+}*/
 
 Index * catalogManager::getIndex(string TableName, string attrName)
 {

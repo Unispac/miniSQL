@@ -13,7 +13,7 @@ using namespace std;
 #define DB_CHAR 201902
 #define maxTableAttr 32
 #define maxCharLen 255
-#define tableFileHeaderSize 8 //8位的表头，保存两个int，分别用来维护指针，并声明是否需要创建新block。
+
 
 
 

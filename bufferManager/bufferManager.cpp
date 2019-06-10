@@ -1,4 +1,6 @@
 #include<bufferManager/bufferManager.h>
+#include<bufferManager/binaryFile.h>
+#include<fstream>
 #include<cstdio>
 
 extern errorReporter * errorHandler;
@@ -71,14 +73,13 @@ bool bufferManager::acessNode(bufferNode * x)
 }  
 // After accessing a node, this node should be placed at the tail of the queue so that it won't be deleted first.
 
-bool bufferManager::writeBlock(const string fileName, int id, const char *data)
+bool bufferManager::writeBlock(const string fileName, int id)
 {
 	Block *block = getBlock(fileName, id);
-	return writeBlock(block, data);
+	return writeBlock(block);
 }
-bool bufferManager::writeBlock(Block * block, const char *data)
+bool bufferManager::writeBlock(Block * block)
 {
-	memcpy(block->data, data, blockSize);
 	block->changed = true;
 	string filePath = ("data/" + block->fileName + ".mdb");
 	FILE * file = fopen(filePath.c_str(), "rb+");
@@ -89,7 +90,8 @@ bool bufferManager::writeBlock(Block * block, const char *data)
 	string x;
 	fseek(file, block->id*blockSize, SEEK_SET);
 	fwrite(block->data, blockSize, 1, file);
-	return fclose(file);
+	fclose(file);
+	return true;
 }
 //Use the writeThrough strategy to ensure the consistency.
 
@@ -99,11 +101,13 @@ Block * bufferManager::loadBlock(const string fileName,int id)
 	string filePath = ("data/" + fileName + ".mdb");
 	FILE * file = fopen(filePath.c_str(), "rb");
 	if (file == NULL)
-	{
 		errorHandler->reportErrorCode(BLOCK_READING_FAIL);
-	}
+	
 
-	fseek(file, id*blockSize, SEEK_SET);
+	int mark = fseek(file, id*blockSize, SEEK_SET);
+	if (mark == -1)
+		errorHandler->reportErrorCode(BLOCK_READING_FAIL);
+
 	fread(block->data, blockSize, 1, file);
 	fclose(file);
 	// read the data.
@@ -123,4 +127,20 @@ bool bufferManager::deleteNode(bufferNode* x)
 	nodeMap.erase(nodeName);
 	blockCnt--;
 	return true;
+}
+
+Block * bufferManager::appendBlock(const string fileName)
+{
+	Block * temp = getBlock(fileName, 0);
+	int blockCnt;
+	binaryFile::readInt(temp->data + 4, &blockCnt);
+	blockCnt++;
+	char* data = new char[blockSize];
+	string filePath = "data/" + fileName + ".mdb";
+	FILE *file = fopen(filePath.c_str(), "ab+");
+	fwrite(data, blockSize, 1, file);
+	fclose(file);
+	binaryFile::writeInt(temp->data + 4, blockCnt);
+	writeBlock(temp);
+	return getBlock(fileName, blockCnt);
 }
