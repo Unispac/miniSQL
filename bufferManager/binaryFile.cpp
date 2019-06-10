@@ -10,29 +10,18 @@ bool binaryFile::writeTableValue(char *p, vector<tableValue>* list, Table* table
 		{
 			case DB_INT:
 				int value = (*list)[i].INT;
-				for (int j = 0; j < 4; j++)
-				{
-					*p = value & LOW_8BITS;
-					p++;
-					value >>= 8;
-				}
+				binaryFile::writeInt(p, value);
+				p += 4;
 				break;
 			case DB_FLOAT:
 				float value = (*list)[i].FLOAT;
-				for (int j = 0; j < 4; j++)
-				{
-					*p = value & LOW_8BITS;
-					p++;
-					value >>= 8;
-				}
+				binaryFile::writeFloat(p, value);
+				p += 4;
 				break;
 			case DB_CHAR:
 				int n = (*typeList)[i]->n;
-				for (int j = 0; j < n; j++)
-				{
-					*p = (*list)[i].CHAR[j];
-					p++;
-				}
+				binaryFile::writeChar(p, (*list)[i].CHAR, n);
+				p += n;
 				break;
 		}
 	}
@@ -47,34 +36,51 @@ bool binaryFile::readTableValue(char *p, vector<tableValue>* list, Table *table)
 		switch ((*typeList)[i]->dbType)
 		{
 		case DB_INT:
-			int value = 0;
-			for (int j = 0; j < 4; j++)
-			{
-				value |= *p;
-				value <<= 8;
-				p++;
-			}
-			(*list)[i].INT = value;
+			binaryFile::readInt(p, &((*list)[i].INT));
+			p += 4;
 			break;
 		case DB_FLOAT:
-			float value = 0;
-			for (int j = 0; j < 4; j++)
-			{
-				value |= *p;
-				value <<= 8;
-				p++;
-			}
-			(*list)[i].FLOAT = value;
+			binaryFile::readFloat(p, &((*list)[i].FLOAT));
+			p += 4;
 			break;
 		case DB_CHAR:
 			int n = (*typeList)[i]->n;
-			for (int j = 0; j < n; j++)
-			{
-				(*list)[i].CHAR[j] = *p;
-				p++;
-			}
+			binaryFile::readChar(p, (*list)[i].CHAR,n);
+			p += n;
 			break;
 		}
 	}
+	return true;
+}
+
+bool binaryFile::writeInt(char *p, int x)
+{
+	memcpy(p, &x, 4);
+	return true;
+}
+bool binaryFile::writeFloat(char *p, float x)
+{
+	memcpy(p, &x, 4);
+	return true;
+}
+bool binaryFile::writeChar(char *p, char *data, int n)
+{
+	memcpy(p, data, n);
+	return true;
+}
+
+bool binaryFile::readInt(char *p, int *x)
+{
+	memcpy(x, p, 4);
+	return true;
+}
+bool binaryFile::readFloat(char *p, float *x)
+{
+	memcpy(x, p, 4);
+	return true;
+}
+bool binaryFile::readChar(char *p, char *data, int n)
+{
+	memcpy(data, p, n);
 	return true;
 }
