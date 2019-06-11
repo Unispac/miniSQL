@@ -87,7 +87,7 @@ bool recordManager::defragmentation(string tableName)  //碎片整理，心情好再写
 	return false;
 }
 
-vector<tableValue> * recordManager::getRecordById(string tableName,int id) //只是为了debug用
+vector<tableValue> * recordManager::getRecordById(string tableName,int id)  
 {
 	tableFile * file = new tableFile(tableName);
 	vector<tableValue> * temp = file->getRecord(id);

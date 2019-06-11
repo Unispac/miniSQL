@@ -1,6 +1,6 @@
 #include<config.h>
 #include<bufferManager/bufferManager.h>
-#include<catlogManager/catalogManager.h>
+#include<catalogManager/catalogManager.h>
 #include<recordManager/recordManager.h>
 #include<fstream>
 #include<table/Table.h>

@@ -4,7 +4,7 @@
 #include<config.h>
 #include<bufferManager/binaryFile.h>
 #include<bufferManager/bufferManager.h>
-#include<catlogManager/catalogManager.h>
+#include<catalogManager/catalogManager.h>
 #include<table/Table.h>
 #include<vector>
 

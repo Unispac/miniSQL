@@ -5,7 +5,7 @@
 #include<vector>
 #include<set>
 #include<logic/Logic.h>
-#include<catlogManager/catalogManager.h>
+#include<catalogManager/catalogManager.h>
 #include<bufferManager/bufferManager.h>
 #include<table/tableFile.h>
 
