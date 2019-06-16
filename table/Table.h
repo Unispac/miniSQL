@@ -43,6 +43,8 @@ public:
 	vector<dbDataType*> * attrList;
 	vector<string> * attributesHaveIndex;
 	Table(string tableName, vector<dbDataType*>*attr, vector<string> * index);
+	dbDataType* findAttrByName(string name);
+	dbDataType* findAttrByName(const char* name);
 };
 
 #endif // !Table_H

@@ -47,6 +47,7 @@ Block * bufferManager::getBlock(const string fileName, int id)
 	{
 		bufferNode * temp = pilarHead->next;
 
+		// find the unlocked block who has the least priority
 		while (temp != pilarTail && temp->block->pin)
 			temp = temp->next;
 

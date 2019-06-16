@@ -37,3 +37,19 @@ Table::Table(string tableName, vector<dbDataType*>*attr, vector<string> * index)
 	if (primaryKey==-1)
 		errorHandler->reportErrorCode(NO_PRIMARYKEY);
 }
+
+dbDataType* Table::findAttrByName(string name)
+{
+	for (int i = 0; i < attrList->size(); i++)
+	{
+		if ((*attrList)[i]->name == name)
+			return (*attrList)[i];
+	}
+	return NULL;
+}
+
+dbDataType* Table::findAttrByName(const char* name)
+{
+	string strname(name);
+	return findAttrByName(strname);
+}
