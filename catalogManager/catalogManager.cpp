@@ -14,9 +14,9 @@ catalogManager::catalogManager()
 		string filePath = "catalog/tableNameList.mdb";
 		ifstream infile;
 		infile.open(filePath, ios::in);
-	
+		
 		if (infile.fail())errorHandler->reportErrorCode(NO_TABLE_LIST);
-	
+
 		string temp;
 		while (infile >> temp)
 		{
@@ -25,14 +25,13 @@ catalogManager::catalogManager()
 		infile.close();
 	}
 	
+	
 	if (indexMap.empty())
 	{
-		string filePath = "catalog/indexNameList.mdb";
+		string filePath = "catalog/tableNameList.mdb";
 		ifstream infile;
 		infile.open(filePath, ios::in);
-
 		if (infile.fail()) errorHandler->reportErrorCode(NO_INDEX_LIST);
-
 		string name, tableName, colName;
 		while (infile >> name >> tableName >> colName)
 		{

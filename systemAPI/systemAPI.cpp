@@ -5,9 +5,12 @@
 systemAPI::systemAPI()
 {
 	buffer = new bufferManager();
+	
 	recorder = new recordManager();
 	catalog = new catalogManager();
+
 	indexer = new indexManager();
+
 }
 systemAPI::~systemAPI()
 {

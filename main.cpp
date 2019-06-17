@@ -6,23 +6,27 @@
 #include<fstream>
 #include<table/Table.h>
 #include<interpreter\Interpreter.h>
+#include<systemAPI\systemAPI.h>
 using namespace std;
 
 errorReporter * errorHandler;
+systemAPI * api;
 void configInit()
 {
-	errorHandler = new errorReporter();
 	CreateDirectory("data", NULL);
 	CreateDirectory("catalog", NULL);
 	if (fopen("catalog/tableNameList.mdb", "rb") == NULL)
 		fopen("catalog/tableNameList.mdb", "ab+");
+	errorHandler = new errorReporter();
+	api = new systemAPI();
 }
 int main()
 {
-	Interpreter::getType(Interpreter::CMD());
+	configInit();
+	cout << Interpreter::getType(Interpreter::CMD()) << endl;
 	system("pause");
 	return 0;
-	configInit();
+	
 	bool x = true;
 	vector<dbDataType*> *test = new vector<dbDataType*>;
 	/*

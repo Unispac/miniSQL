@@ -6,6 +6,7 @@
 #include<utils\stringProcesser.h>
 #include<interpreter\syntaxError.h>
 #include<cstring>
+#include<interpreter\createTable.h>
 using namespace std;
 
 class Interpreter
@@ -19,6 +20,8 @@ public:
 		{
 			cout << ">> ";
 			getline(cin, y);
+			stringProcesser::trim(y);
+			if (y.empty())continue;
 			x += y;
 			if (y[y.size() - 1] == ';')break;
 		}
@@ -28,7 +31,10 @@ public:
 			if (x[i] >= 'A' && x[i] <= 'Z')x[i] += 32;
 			else if (x[i] == '	'||x[i]=='	')x[i] = ' ';
 		}
-		return x.substr(0,x.size()-1);
+		stringProcesser::trim(x);
+		x = x.substr(0, x.size() - 1);
+		stringProcesser::trim(x);
+		return x;
 	}
 
 	static string getType(string x)
@@ -40,6 +46,7 @@ public:
 		{
 			y = x.substr(0, head);
 			int tail = x.find_last_of(')');
+			if (tail == -1)return "syntax error";
 			x = x.substr(head + 1, tail - head-1);
 			vector<string> temp = stringProcesser::split(y, " ");
 			int size = temp.size();
@@ -48,9 +55,11 @@ public:
 			{
 				if (size == 3 && temp[1] == "table")
 				{
+					createTable::create(temp[2], x);
 					return "create table";
+			
 				}
-				else if (size == 5 && temp[2] == "index" && temp[4] == "on")
+				else if (size == 5 && temp[1] == "index" && temp[3] == "on")
 				{
 					return "create index";
 				}

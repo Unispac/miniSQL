@@ -7,7 +7,9 @@ class syntaxError
 public:
 	static void Error()
 	{
-		exit(0);
+		cout << "SYTAX ERROR " << endl;
+		return;
+		//exit(0);
 	}
 };
 #endif // ! syntaxError_H
