@@ -2,6 +2,7 @@
 #include<bufferManager/bufferManager.h>
 #include<catalogManager/catalogManager.h>
 #include<recordManager/recordManager.h>
+#include <indexManager/indexManager.h>
 #include<fstream>
 #include<table/Table.h>
 #include<interpreter\Interpreter.h>
