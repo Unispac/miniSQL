@@ -6,6 +6,7 @@
 #include<utils\stringProcesser.h>
 #include<interpreter\syntaxError.h>
 
+extern systemAPI * api;
 class createTable
 {
 public:
@@ -85,15 +86,14 @@ public:
 			}	
 			tempAttr = new dbDataType(tempType, tempN, tempName, tempUnique, tempPrimary, tempIndex);
 			attr->push_back(tempAttr);
-			cout << i << endl;
+			
 		}
 
 		size = attr->size();
-		cout << size << endl;
+
 		int i;
 		for (i = 0; i < size; i++)
 		{
-			cout << (*attr)[i]->name << " " << primaryKey << endl;
 			if ((*attr)[i]->name == primaryKey)
 			{
 				(*attr)[i]->primary = true;
@@ -103,21 +103,21 @@ public:
 
 		if (i == size) { syntaxError::Error(); return false; }
 		
-
+		/*
 		for (i = 0; i < size; i++)
 		{
 			cout << "name : " << (*attr)[i]->name << " type : " << (*attr)[i]->dbType << " unique : " << (*attr)[i]->unique << " primary :" << (*attr)[i]->primary << " index : " << (*attr)[i]->hasIndex << " charLen : " << (*attr)[i]->n << endl;
 		}
+		*/
 
-		/*
-		bool result=systemAPI::createTable(tableName, attr);
+		bool result=api->createTable(tableName, attr);
 		for (int i = 0; i < size; i++)
 		{
 			delete (*attr)[i];
 		}
 		delete attr;
 		return result;
-		*/
+		
 	}
 
 };

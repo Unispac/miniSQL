@@ -2,6 +2,7 @@
 #include<bufferManager/binaryFile.h>
 #include<table/tableFile.h>
 
+extern errorReporter * errorHandler;
 
 recordManager::recordManager()
 {
@@ -36,6 +37,11 @@ bool recordManager::createTable(string tableName)
 bool recordManager::dropTable(string tableName) // recorder只负责管理表内容.表头信息由catalog管，索引信息由index管。
 {
 	string filePath = "data/" + tableName + ".mdb";
+	/*if (fopen(filePath.c_str(), "rb") == NULL)
+	{
+		errorHandler->reportErrorCode(NO_TABLE_TO_DROP);
+		return false;
+	}*/
 	remove(filePath.c_str());
 	return true;
 }

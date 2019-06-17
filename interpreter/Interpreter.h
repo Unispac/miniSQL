@@ -7,6 +7,10 @@
 #include<interpreter\syntaxError.h>
 #include<cstring>
 #include<interpreter\createTable.h>
+#include<interpreter/insertRecord.h>
+#include<interpreter/dropTable.h>
+#include<interpreter/dropIndex.h>
+#include<interpreter/createIndex.h>
 using namespace std;
 
 class Interpreter
@@ -55,21 +59,22 @@ public:
 			{
 				if (size == 3 && temp[1] == "table")
 				{
-					createTable::create(temp[2], x);
-					return "create table";
-			
+					if(createTable::create(temp[2], x))return "create table";
+					else return "syntax error";
 				}
 				else if (size == 5 && temp[1] == "index" && temp[3] == "on")
 				{
-					return "create index";
+					if(createIndex::create(temp[2],temp[4]))return "create index";
+					else return "syntax error";
 				}
 				else return "syntax error";
 			}
 			else if (temp[0] == "insert")
 			{
-				if (size == 4 && temp[1] == "into"&&temp[3] == "values")
+				if (size == 4 && temp[1] == "into" &&temp[3]=="values")
 				{
-					return "insert record";
+					if(insertRecord::insert(temp[2], x))return "insert record";
+					else return "syntax error";
 				}
 				else return "syntax error";
 			}
@@ -84,8 +89,16 @@ public:
 				if (temp[0] == "drop")
 				{
 					if (size != 3)return "syntax error";
-					else if (temp[1] == "table")return "drop table";
-					else if (temp[1] == "index")return "drop index";
+					else if (temp[1] == "table")
+					{
+						if(dropTable::drop(temp[2]))return "drop table";
+						else return "syntax error";
+					}
+					else if (temp[1] == "index")
+					{
+						if(dropIndex::drop(temp[2]))return "drop index";
+						else return "syntax error";
+					}
 					else return "syntax error";
 				}
 				else

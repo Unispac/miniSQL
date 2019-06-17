@@ -30,6 +30,8 @@ using namespace std;
 #define INDEX_NAME_DUPLICATE 21
 #define NOT_UNIQUE 22
 #define MULTIPLE_INDEX 23
+#define VALUE_TABLE_NOT_MATCH 24
+#define CHAR_LEN_EXCEED 25
 
 class errorReporter
 {
@@ -62,6 +64,8 @@ public:
 		errorTemplate[21] = " * error [21] : Duplicate index name, one name corresponds to one index. ";
 		errorTemplate[22] = " * error [22] : The attribute on which index is built is not unique. ";
 		errorTemplate[23] = " * error [23] : An index has already been built on the attribute. ";
+		errorTemplate[24] = " * error [24] : The value can't match the relation schema. ";
+		errorTemplate[25] = " * error [25] : The length of the varchar exceeds the upper bound.";	
 	}
 
 
@@ -70,9 +74,7 @@ public:
 	{
 		if (errorTemplate.count(x) != 0)
 		{
-			cout << errorTemplate[x];
-			system("pause");
-			exit(0);
+			cout << errorTemplate[x] << endl;
 		}
 	}
 

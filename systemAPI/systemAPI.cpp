@@ -1,16 +1,14 @@
 #include<systemAPI\systemAPI.h>
-
-
+#include<utils/stringProcesser.h>
+#include<sstream>
+extern errorReporter * errorHandler;
 
 systemAPI::systemAPI()
 {
 	buffer = new bufferManager();
-	
 	recorder = new recordManager();
 	catalog = new catalogManager();
-
 	indexer = new indexManager();
-
 }
 systemAPI::~systemAPI()
 {
@@ -22,15 +20,16 @@ systemAPI::~systemAPI()
 
 bool systemAPI::createTable(string tableName, vector<dbDataType*>*attr)
 {
-	catalog->createTable(tableName, attr);
-	recorder->createTable(tableName);
+
+	if(!catalog->createTable(tableName, attr))return false;
+	if(!recorder->createTable(tableName))return false;
 	return true;
 }
 
 bool systemAPI::dropTable(string tableName)
 {
-	catalog->dropTable(tableName);
-	recorder->dropTable(tableName);
+	if(!catalog->dropTable(tableName))return false;
+	if(!recorder->dropTable(tableName))return false;
 	return true;
 }
 
@@ -57,10 +56,92 @@ vector<vector<tableValue>*> * systemAPI::selet(string tableName, vector<Logic>* 
 	return result;
 }
 
-bool systemAPI::insert(string tableName, vector<tableValue>* value)
+bool systemAPI::insert(string tableName, vector<string> vList)  //目前还没有做约束检查
 {
-	recorder->insertTableInstance(tableName, value);
-	return true;
+	Table * table = catalog->getTable(tableName);
+	
+	if (table == NULL)return false;
+	vector<dbDataType*> * attrList = table->attrList;
+	vector<tableValue> * value = new vector<tableValue>;
+	tableValue x;
+
+	int size = attrList->size();
+	if (size != vList.size())
+	{
+		errorHandler->reportErrorCode(VALUE_TABLE_NOT_MATCH);
+		return false;
+	}
+	//vector<tableValue>* value
+	for (int i = 0; i < size; i++)
+	{
+		x.CHAR = NULL;
+		if ((*attrList)[i]->dbType == DB_INT)
+		{
+			if (!stringProcesser::isInt(vList[i]))
+			{
+				errorHandler->reportErrorCode(VALUE_TABLE_NOT_MATCH);
+				return false;
+			}
+			else
+			{
+				stringstream tran;
+				tran << vList[i];
+				tran >> x.INT;
+				value->push_back(x);
+			}
+		}
+		else if ((*attrList)[i]->dbType == DB_FLOAT)
+		{
+			if (!stringProcesser::isFloat(vList[i]))
+			{
+				errorHandler->reportErrorCode(VALUE_TABLE_NOT_MATCH);
+				return false;
+			}
+			else
+			{
+				stringstream tran;
+				tran << vList[i];
+				tran >> x.FLOAT;
+				value->push_back(x);
+			}
+		}
+		else
+		{
+			if (!stringProcesser::isChar(vList[i]))
+			{
+				errorHandler->reportErrorCode(VALUE_TABLE_NOT_MATCH);
+				return false;
+			}
+			else
+			{
+				stringProcesser::getRidQuo(vList[i]);
+				int maxLen = (*attrList)[i]->n;
+				if (vList[i].size() > maxLen)
+				{
+					errorHandler->reportErrorCode(CHAR_LEN_EXCEED);
+				}
+				x.CHAR = new char[maxLen];
+				memcpy(x.CHAR, vList[i].c_str(), vList[i].size()+1);
+				value->push_back(x);
+			}
+		}
+	}
+	bool result =recorder->insertTableInstance(tableName, value);
+	char *temp;
+	for (int i = 0; i < size; i++)
+	{
+		//int t = (*attrList)[i]->dbType;
+		//cout << "type : " << t << "     ";
+		//if (t == DB_INT)cout << (*value)[i].INT << endl;
+		//else if(t==DB_FLOAT)cout << (*value)[i].FLOAT << endl;
+		//else cout << (*value)[i].CHAR << endl;
+
+		temp = (*value)[i].CHAR;
+		if (temp != NULL)delete temp;
+	}
+	delete value;
+	delete table;
+	return result;
 }
 bool systemAPI::remove(string tableName, vector<Logic>* conditions)
 {
