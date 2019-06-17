@@ -25,11 +25,12 @@ tableFile::~tableFile()
 	delete catalog;
 	delete buffer;
 }
-bool tableFile::insertRecord(vector<tableValue>* value)
+int tableFile::insertRecord(vector<tableValue>* value)
 {
 	//cout << "INSER : ID = " << emptyId << endl;
 	int blockId = (emptyId / recordNumPerBlock) + 1;
 	int offset = emptyId % recordNumPerBlock;
+	int ret = emptyId;
 
 	maxId = max(maxId, emptyId);
 	Block *block;
@@ -57,7 +58,7 @@ bool tableFile::insertRecord(vector<tableValue>* value)
 	updateHeader();
 
 	
-	return true;
+	return ret;
 }
 bool tableFile::deleteRecord(int id,bool commit)
 {

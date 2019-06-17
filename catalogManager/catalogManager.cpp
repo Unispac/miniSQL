@@ -148,7 +148,7 @@ bool catalogManager::dropTable(string TableName)
 	return true;
 }
 
-/*bool catalogManager::updateTable(Table * table)
+bool catalogManager::updateTable(Table * table)
 {
 	string tableName = table->name;
 	string filePath = "catalog/table_" + tableName+ ".mdb";
@@ -161,10 +161,9 @@ bool catalogManager::dropTable(string TableName)
 		temp = (*(table->attrList))[i];
 		outfile << temp->dbType << " " << temp->n << " " << temp->name << " " << temp->unique << " " << temp->primary << " " << temp->hasIndex << endl;
 	}
-	outfile << table->rowCnt << endl; //rowCnt=0
 	outfile.close();
 	return true;
-}*/
+}
 
 Index * catalogManager::getIndexByName(string indexName)
 {
@@ -214,10 +213,19 @@ bool catalogManager::createIndex(string indexName, string TableName, string colN
 	}
 
 	Table* table = getTable(TableName);
-	bool unique = table->findAttrByName(colName)->unique;
-	if (!unique)
+	dbDataType* attr = table->findAttrByName(colName);
+	bool unique;
+	if (attr != NULL)
 	{
-		errorHandler->reportErrorCode(NOT_UNIQUE);
+		if (!attr->unique)
+		{
+			errorHandler->reportErrorCode(NOT_UNIQUE);
+			return false;
+		}
+	}
+	else
+	{
+		errorHandler->reportErrorCode(ATTR_NOT_FOUND);
 		return false;
 	}
 
@@ -227,6 +235,10 @@ bool catalogManager::createIndex(string indexName, string TableName, string colN
 		errorHandler->reportErrorCode(MULTIPLE_INDEX);
 		return false;
 	}
+
+	attr->hasIndex = true;
+	table->attributesHaveIndex->push_back(colName);
+	updateTable(table);
 
 	char indexData[maxTableAttr * 3];
 	memset(indexData, 0, sizeof(indexData));
@@ -249,6 +261,17 @@ bool catalogManager::dropIndex(string indexName)
 		errorHandler->reportErrorCode(NO_INDEX_NAME);
 		return false;
 	}
+
+	Table* table = getTable(string(indexMap[indexName]->getTableName()));
+	dbDataType* attr = table->findAttrByName(indexMap[indexName]->getColName());
+	attr->hasIndex = false;
+	int pos;
+	for (pos = 0; pos < table->attributesHaveIndex->size(); pos++)
+	{
+		if ((*table->attributesHaveIndex)[pos] == attr->name) break;
+	}
+	table->attributesHaveIndex->erase(table->attributesHaveIndex->begin() + pos);
+	updateTable(table);
 
 	delete indexMap[indexName];
 	indexMap.erase(indexName);

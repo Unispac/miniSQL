@@ -13,7 +13,7 @@ class tableFile
 public:
 	tableFile(string);
 	~tableFile();
-	bool insertRecord(vector<tableValue>* value);
+	int insertRecord(vector<tableValue>* value);
 	bool deleteRecord(int id,bool commit=true);
 	vector<tableValue> * getRecord(int id);
 	bool updateHeader();

@@ -40,12 +40,12 @@ bool recordManager::dropTable(string tableName) // recorder只负责管理表内容.表头
 	return true;
 }
 
-bool recordManager::insertTableInstance(string tableName, vector<tableValue>* value)// 每次只需要添加一条表项，将值表列出来就行了。
+int recordManager::insertTableInstance(string tableName, vector<tableValue>* value)// 每次只需要添加一条表项，将值表列出来就行了。
 {
 	tableFile * file = new tableFile(tableName);
-	file->insertRecord(value);
+	int ret = file->insertRecord(value);
 	delete file;
-	return true;
+	return ret;
 }
 bool recordManager::deleteTableInstance(string tableName, vector<int>* list)                                //先查询再做删除？  策略？ 用一个链表维护替换？ 要求list必须从小到大排序。
 {

@@ -30,6 +30,7 @@ using namespace std;
 #define INDEX_NAME_DUPLICATE 21
 #define NOT_UNIQUE 22
 #define MULTIPLE_INDEX 23
+#define ATTR_NOT_FOUND 24
 
 class errorReporter
 {
@@ -62,6 +63,7 @@ public:
 		errorTemplate[21] = " * error [21] : Duplicate index name, one name corresponds to one index. ";
 		errorTemplate[22] = " * error [22] : The attribute on which index is built is not unique. ";
 		errorTemplate[23] = " * error [23] : An index has already been built on the attribute. ";
+		errorTemplate[24] = " * error [24] : No Attribute with given name. ";
 	}
 
 

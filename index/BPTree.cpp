@@ -17,8 +17,11 @@ void BPTree::createFile(const char* _filename, int _keyLength, int _dataType, in
 {
 	if (_fan_out == -1)
 		_fan_out = (blockSize - 8) / (_keyLength + 4) + 1;
+	string PATH = "data/" + string(_filename) + ".mdb";
+	cout << "PATH = " << PATH << endl;
 	FILE* file = fopen(("data/" + string(_filename) + ".mdb").c_str(), "wb");
 	int header[] = { _fan_out, _keyLength, _dataType, 0, -1, -1 };
+	cout << "Size of header = " << sizeof(header) << endl;
 	fwrite(header, 4, 6, file);
 	fclose(file);
 }
