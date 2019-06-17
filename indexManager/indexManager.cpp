@@ -13,6 +13,12 @@
 
 extern errorReporter* errorHandler;
 
+void deleteFile(string filePath)
+{
+	remove(filePath.c_str());
+	return;
+}
+
 int indexManager::find(const char* indexName, const char* key)
 {
 	BPTree* tree = new BPTree(("index/" + string(indexName)).c_str());
@@ -57,7 +63,6 @@ bool indexManager::createIndex(const char* indexName)
 
 bool indexManager::dropIndex(const char* indexName)
 {
-	string filePath = string("data/") + string("index/") + string(indexName) + string(".mdb");
-	deleteFile(filePath);
+	string filePath = string("data/") + string("index/") + string(indexName) + string(".mdb");	
 	return true;
 }

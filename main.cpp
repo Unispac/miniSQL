@@ -19,7 +19,8 @@ void configInit()
 }
 int main()
 {
-	Interpreter::CMD();
+	Interpreter::getType(Interpreter::CMD());
+	system("pause");
 	return 0;
 	configInit();
 	bool x = true;

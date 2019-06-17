@@ -38,7 +38,7 @@ public:
 private:
 	static int blockCnt;
 	static bufferNode *pilarHead, *pilarTail;
-	static map<string, bufferNode*>nodeMap;
+	static map<string, bufferNode*> nodeMap;
 	Block * loadBlock(const string fileName,int id); 
 	bool deleteNode(bufferNode *node);
 };

@@ -10,6 +10,9 @@ int bufferManager::blockCnt = 0;
 bufferNode* bufferManager::pilarHead = NULL;
 bufferNode* bufferManager::pilarTail = NULL;
 
+map<string, bufferNode*> bufferManager::nodeMap;
+//map<string, bufferNode*>  bufferManager::nodeMap;
+
 bufferManager::bufferManager()
 {
 	if (pilarHead == NULL && pilarTail == NULL)

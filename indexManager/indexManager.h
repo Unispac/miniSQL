@@ -4,11 +4,6 @@
 #include<index/Index.h>
 #include <fstream>
 
-void deleteFile(string filePath)
-{
-	remove(filePath.c_str());
-	return;
-}
 
 class indexManager
 {

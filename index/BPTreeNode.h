@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <config.h>
+#include<bufferManager\binaryFile.h>
 using namespace std;
 
 class BPTreeNode
