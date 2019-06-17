@@ -23,6 +23,11 @@ struct dbDataType
 		name = inName;
 		hasIndex = inIndex;
 	}
+	int getKeyLength()
+	{
+		if (dbType == DB_INT || dbType == DB_FLOAT) return 4;
+		else return n;
+	}
 };
 
 struct tableValue

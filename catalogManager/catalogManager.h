@@ -5,6 +5,8 @@
 #include<table/Table.h>
 #include<index/Index.h>
 #include<set>
+#include <map>
+#include <vector>
 
 using namespace std;
 
@@ -17,12 +19,15 @@ public:
 	bool createTable(string TableName, vector<dbDataType*>*attr);
 	bool dropTable(string TableName);
 
-	Index * getIndex(string TableName, string attrName);
-	bool createIndex(string TableName, string attrName);
-	bool dropIndex(string TableName, string attrName);
+	Index * getIndexByName(string indexName);
+	Index * getIndexByTableCol(string TableName, string colName);
+	void getIndexByTable(string TableName, vector<Index*>* vec);
+	bool createIndex(string indexName, string TableName, string colName);
+	bool dropIndex(string indexName);
+	bool dropIndex(string TableName, string colName);
 
 private:
-	set <string> tableNameList;
-
+	static set <string> tableNameList;
+	static map <string, Index*> indexMap;
 };
 #endif // ! catalogManager_H

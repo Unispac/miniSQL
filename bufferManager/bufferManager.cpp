@@ -6,24 +6,25 @@
 extern errorReporter * errorHandler;
 
 const int bufferManager::maxBlockNum = bufferMaxSize;  // the buffer can hold at most maxBlockNum blocks.b
+int bufferManager::blockCnt = 0;
+bufferNode* bufferManager::pilarHead = NULL;
+bufferNode* bufferManager::pilarTail = NULL;
 
 bufferManager::bufferManager()
 {
-	blockCnt = 0;
-	pilarHead = new bufferNode(NULL);
-	pilarTail = new bufferNode(NULL);
-	pilarHead->last = pilarHead;
-	pilarHead->next = pilarTail;
-	pilarTail->next = pilarTail;
-	pilarTail->last = pilarHead;
+	if (pilarHead == NULL && pilarTail == NULL)
+	{
+		pilarHead = new bufferNode(NULL);
+		pilarTail = new bufferNode(NULL);
+		pilarHead->last = pilarHead;
+		pilarHead->next = pilarTail;
+		pilarTail->next = pilarTail;
+		pilarTail->last = pilarHead;
+	}
 }
 
 bufferManager::~bufferManager()
 {
-	while (pilarHead->next != pilarTail)
-		delete pilarHead->next;
-	delete pilarHead;
-	delete pilarTail;
 }
 
 Block * bufferManager::getBlock(const string fileName, int id)

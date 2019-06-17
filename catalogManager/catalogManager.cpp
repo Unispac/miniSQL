@@ -4,20 +4,47 @@
 
 extern errorReporter * errorHandler;
 
+set<string> catalogManager::tableNameList;
+map<string, Index*> catalogManager::indexMap;
+
 catalogManager::catalogManager()
 {
-	string filePath = "catalog/tableNameList.mdb";
-	ifstream infile;
-	infile.open(filePath, ios::in);
-	
-	if (infile.fail())errorHandler->reportErrorCode(NO_TABLE_LIST);
-	
-	string temp;
-	while (infile>>temp)
+	if (tableNameList.empty())
 	{
-		tableNameList.insert(temp);
+		string filePath = "catalog/tableNameList.mdb";
+		ifstream infile;
+		infile.open(filePath, ios::in);
+	
+		if (infile.fail())errorHandler->reportErrorCode(NO_TABLE_LIST);
+	
+		string temp;
+		while (infile >> temp)
+		{
+			tableNameList.insert(temp);
+		}
+		infile.close();
 	}
-	infile.close();
+	
+	if (indexMap.empty())
+	{
+		string filePath = "catalog/indexNameList.mdb";
+		ifstream infile;
+		infile.open(filePath, ios::in);
+
+		if (infile.fail()) errorHandler->reportErrorCode(NO_INDEX_LIST);
+
+		string name, tableName, colName;
+		while (infile >> name >> tableName >> colName)
+		{
+			char data[3 * maxTableAttr];
+			memset(data, 0, sizeof(data));
+			memcpy(data, name.c_str(), name.size());
+			memcpy(data + maxTableAttr, tableName.c_str(), tableName.size());
+			memcpy(data + 2 * maxTableAttr, colName.c_str(), colName.size());
+			Index* index = new Index(data);
+			indexMap[name] = index;
+		}
+	}
 }
 
 catalogManager::~catalogManager()
@@ -139,15 +166,115 @@ bool catalogManager::dropTable(string TableName)
 	return true;
 }*/
 
-Index * catalogManager::getIndex(string TableName, string attrName)
+Index * catalogManager::getIndexByName(string indexName)
 {
+	if (indexMap.find(indexName) == indexMap.end())
+	{
+		errorHandler->reportErrorCode(NO_INDEX_NAME);
+		return NULL;
+	}
+	return indexMap[indexName];
+}
+
+Index * catalogManager::getIndexByTableCol(string TableName, string colName)
+{
+	for (auto it : indexMap)
+	{
+		Index* index = it.second;
+		if (
+			strcmp(index->getTableName(), TableName.c_str()) == 0 &&
+			strcmp(index->getColName(), colName.c_str()) == 0
+			)
+			return index;
+	}
 	return NULL;
 }
-bool catalogManager::createIndex(string TableName, string attrName)
+
+void catalogManager::getIndexByTable(string TableName, vector<Index*>* vec)
 {
+	for (auto it : indexMap)
+	{
+		Index* index = it.second;
+		if (strcmp(index->getTableName(), TableName.c_str()) == 0)
+			vec->push_back(index);
+	}
+}
+
+bool catalogManager::createIndex(string indexName, string TableName, string colName)
+{
+	if (indexMap.find(indexName) != indexMap.end())
+	{
+		errorHandler->reportErrorCode(INDEX_NAME_DUPLICATE);
+		return false;
+	}
+	if (tableNameList.find(TableName) == tableNameList.end())
+	{
+		errorHandler->reportErrorCode(NO_TABLE);
+		return false;
+	}
+
+	Table* table = getTable(TableName);
+	bool unique = table->findAttrByName(colName)->unique;
+	if (!unique)
+	{
+		errorHandler->reportErrorCode(NOT_UNIQUE);
+		return false;
+	}
+
+	Index* tcIndex = getIndexByTableCol(TableName, colName);
+	if (tcIndex != NULL)
+	{
+		errorHandler->reportErrorCode(MULTIPLE_INDEX);
+		return false;
+	}
+
+	char indexData[maxTableAttr * 3];
+	memset(indexData, 0, sizeof(indexData));
+	memcpy(indexData, indexName.c_str(), indexName.size());
+	memcpy(indexData + maxTableAttr, TableName.c_str(), TableName.size());
+	memcpy(indexData + maxTableAttr * 2, colName.c_str(), colName.size());
+	indexMap[indexName] = new Index(indexData);
+
+	ofstream outFile;
+	outFile.open("catalog/indexNameList.mdb", ios::app);
+	outFile << indexName << ' ' << TableName << ' ' << colName << endl;
+	outFile.close();
 	return true;
 }
-bool catalogManager::dropIndex(string TableName, string attrName)
+
+bool catalogManager::dropIndex(string indexName)
 {
+	if (indexMap.find(indexName) == indexMap.end())
+	{
+		errorHandler->reportErrorCode(NO_INDEX_NAME);
+		return false;
+	}
+
+	delete indexMap[indexName];
+	indexMap.erase(indexName);
+	ofstream outFile;
+	outFile.open("catalog/indexNameList.mdb", ios::out);
+	for (auto it : indexMap)
+	{
+		Index* index = it.second;
+		outFile << string(index->getName()) << ' ' << string(index->getTableName()) << ' '
+			<< string(index->getColName()) << endl;
+	}
+	outFile.close();
+
+	return true;
+}
+
+bool catalogManager::dropIndex(string TableName, string colName)
+{
+	Index* index = getIndexByTableCol(TableName, colName);
+	if (index == NULL)
+	{
+		errorHandler->reportErrorCode(NO_INDEX_NAME);
+		return false;
+	}
+	string indexName = index->getName();
+	delete index;
+	dropIndex(indexName);
 	return true;
 }

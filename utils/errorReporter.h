@@ -22,7 +22,14 @@ using namespace std;
 #define NO_TABLE_TO_DROP 13
 #define INSTANCE_TOO_LARGE 14
 #define RECORD_DOES_NOT_EXIST 15
-
+#define BPTREE_DUPLICATE_KEY 16
+#define BPTREE_KEY_NOT_FOUND 17
+#define BPTREE_EMPTY 18
+#define NO_INDEX_LIST 19
+#define NO_INDEX_NAME 20
+#define INDEX_NAME_DUPLICATE 21
+#define NOT_UNIQUE 22
+#define MULTIPLE_INDEX 23
 
 class errorReporter
 {
@@ -47,6 +54,14 @@ public:
 		errorTemplate[13] = " * error [13] : Table doesn't exist, can not drop it.";
 		errorTemplate[14] = " * error [14] : Record too large!";
 		errorTemplate[15] = " * error [15] : Unexpected access to an unexisted record.";
+		errorTemplate[16] = " * error [16] : Insertion causes duplicate key in a B+ Tree";
+		errorTemplate[17] = " * error [17] : B+ Tree does not have the key to be deleted";
+		errorTemplate[18] = " * error [18] : B+ Tree Empty and cause fatal error";
+		errorTemplate[19] = " * error [19] : Can't get the index list. There are damages on the DB FILES. ";
+		errorTemplate[20] = " * error [20] : Index Name Does Not Exist. ";
+		errorTemplate[21] = " * error [21] : Duplicate index name, one name corresponds to one index. ";
+		errorTemplate[22] = " * error [22] : The attribute on which index is built is not unique. ";
+		errorTemplate[23] = " * error [23] : An index has already been built on the attribute. ";
 	}
 
 

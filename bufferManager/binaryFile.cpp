@@ -76,17 +76,17 @@ bool binaryFile::writeChar(char *p, char *data, int n)
 	return true;
 }
 
-bool binaryFile::readInt(char *p, int *x)
+bool binaryFile::readInt(const char *p, int *x)
 {
 	memcpy(x, p, 4);
 	return true;
 }
-bool binaryFile::readFloat(char *p, float *x)
+bool binaryFile::readFloat(const char *p, float *x)
 {
 	memcpy(x, p, 4);
 	return true;
 }
-bool binaryFile::readChar(char *p, char *data, int n)
+bool binaryFile::readChar(const char *p, char *data, int n)
 {
 	memcpy(data, p, n);
 	return true;

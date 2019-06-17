@@ -36,9 +36,9 @@ public:
 	bool appendBlock(const string fileName);
 
 private:
-	int blockCnt;
-	bufferNode *pilarHead, *pilarTail;
-	map<string, bufferNode*>nodeMap;
+	static int blockCnt;
+	static bufferNode *pilarHead, *pilarTail;
+	static map<string, bufferNode*>nodeMap;
 	Block * loadBlock(const string fileName,int id); 
 	bool deleteNode(bufferNode *node);
 };
