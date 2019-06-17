@@ -48,7 +48,7 @@ public:
 	*/
 	vector<vector<tableValue>*> * selet(string tableName,vector<Logic>* conditions);
 
-	bool insert(string tableName, vector<tableValue>* value);
+	bool insert(string tableName, vector<string> vList);
 	bool remove(string tableName, vector<Logic>* conditions);
 
 private:

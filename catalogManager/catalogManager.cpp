@@ -14,9 +14,9 @@ catalogManager::catalogManager()
 		string filePath = "catalog/tableNameList.mdb";
 		ifstream infile;
 		infile.open(filePath, ios::in);
-	
+		
 		if (infile.fail())errorHandler->reportErrorCode(NO_TABLE_LIST);
-	
+
 		string temp;
 		while (infile >> temp)
 		{
@@ -25,14 +25,13 @@ catalogManager::catalogManager()
 		infile.close();
 	}
 	
+	
 	if (indexMap.empty())
 	{
-		string filePath = "catalog/indexNameList.mdb";
+		string filePath = "catalog/tableNameList.mdb";
 		ifstream infile;
 		infile.open(filePath, ios::in);
-
 		if (infile.fail()) errorHandler->reportErrorCode(NO_INDEX_LIST);
-
 		string name, tableName, colName;
 		while (infile >> name >> tableName >> colName)
 		{
@@ -57,12 +56,18 @@ Table * catalogManager::getTable(string TableName)
 	string filePath = "catalog/table_" + TableName + ".mdb";
 	ifstream infile;
 	
-	if(tableNameList.count(TableName)==0)
+	if (tableNameList.count(TableName) == 0)
+	{
 		errorHandler->reportErrorCode(NO_TABLE);
+		return NULL;
+	}
 
 	infile.open(filePath, ios::in);
-	if (infile.fail())errorHandler->reportErrorCode(NO_TABLE);
-	
+	if (infile.fail())
+	{
+		errorHandler->reportErrorCode(NO_TABLE);
+		return NULL;
+	}
 
 	vector<dbDataType*> * attr = new vector<dbDataType*>;
 	vector<string> * index = new vector<string>;
@@ -83,11 +88,16 @@ bool catalogManager::createTable(string TableName,vector<dbDataType*>*attr)
 	dbDataType * temp;
 
 	if (tableNameList.count(TableName) != 0)
+	{
 		errorHandler->reportErrorCode(TABLE_ALREADY_EXIST);
-	
+		return false;
+	}
 	int len = attr->size();
-	if (len > maxTableAttr)errorHandler->reportErrorCode(TOO_MANY_ATTR);
-
+	if (len > maxTableAttr)
+	{
+		errorHandler->reportErrorCode(TOO_MANY_ATTR);
+		return false;
+	}
 	int cntOfPrimary=0;
 	set<string>attrName;
 
@@ -95,20 +105,40 @@ bool catalogManager::createTable(string TableName,vector<dbDataType*>*attr)
 	{
 		temp = (*attr)[i];
 		if (temp->primary)cntOfPrimary++;
-		if (temp->dbType==DB_CHAR && temp->n > maxCharLen)errorHandler->reportErrorCode(TOO_LARGE_CHAR);
-		if (attrName.count(temp->name) != 0)errorHandler->reportErrorCode(ATTR_NAME_REDUNDANCY);
-		if ((temp->unique == false&&temp->primary == false) && temp->hasIndex == true)errorHandler->reportErrorCode(CAN_NOT_SET_INDEX);
-
+		if (temp->dbType == DB_CHAR && temp->n > maxCharLen)
+		{
+			errorHandler->reportErrorCode(TOO_LARGE_CHAR);
+			return false;
+		}
+		if (attrName.count(temp->name) != 0)
+		{
+			errorHandler->reportErrorCode(ATTR_NAME_REDUNDANCY);
+			return false;
+		}
+		if ((temp->unique == false && temp->primary == false) && temp->hasIndex == true)
+		{
+			errorHandler->reportErrorCode(CAN_NOT_SET_INDEX);
+			return false;
+		}
 		attrName.insert(temp->name);
 
 		if (temp->dbType != DB_CHAR && temp->dbType != DB_FLOAT && temp->dbType != DB_INT)
+		{
 			errorHandler->reportErrorCode(ILLEGAL_DATA_TYPE);
+			return false;
+		}
 	}
 
 	if (cntOfPrimary > 1)
+	{
 		errorHandler->reportErrorCode(TOO_MANY_PRIMARY);
+		return false;
+	}
 	else if (cntOfPrimary < 1)
+	{
 		errorHandler->reportErrorCode(NO_PRIMARYKEY);
+		return false;
+	}
 
 	string filePath = "catalog/table_" + TableName + ".mdb";
 	ofstream outfile;
@@ -128,8 +158,10 @@ bool catalogManager::createTable(string TableName,vector<dbDataType*>*attr)
 bool catalogManager::dropTable(string TableName)
 {
 	if (tableNameList.count(TableName) == 0)
+	{
 		errorHandler->reportErrorCode(NO_TABLE_TO_DROP);
-
+		return false;
+	}
 	tableNameList.erase(TableName);
 	string filePath = "catalog/table_" + TableName + ".mdb";
 

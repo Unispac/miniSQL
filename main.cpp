@@ -7,12 +7,13 @@
 #include<fstream>
 #include<table/Table.h>
 #include<interpreter\Interpreter.h>
+#include<systemAPI\systemAPI.h>
 using namespace std;
 
 errorReporter * errorHandler;
+systemAPI * api;
 void configInit()
 {
-	errorHandler = new errorReporter();
 	CreateDirectory("data", NULL);
 	CreateDirectory("catalog", NULL);
 	CreateDirectory("data/index", NULL);
@@ -30,6 +31,20 @@ int main()
 	catalogManager * p = new catalogManager();
 	recordManager *r = new recordManager();
 	indexManager* imanager = new indexManager();
+
+	errorHandler = new errorReporter();
+	api = new systemAPI();
+	cout << Interpreter::getType(Interpreter::CMD()) << endl;
+	system("pause");
+	return 0;
+}
+/*
+int main()
+{
+	configInit();
+	cout << Interpreter::getType(Interpreter::CMD()) << endl;
+	system("pause");
+	return 0;
 
 	bool x = true;
 	vector<dbDataType*> *test = new vector<dbDataType*>;
@@ -126,10 +141,10 @@ int main()
 	cout << imanager->find("strid_t1", "4") << endl;
 	cout << imanager->find("strid_t1", "5") << endl;
 	system("pause");
-	/*
-		dbDataType(int inType, int inN, string inName, 
-		bool inUnique = false, bool inPrimary = false, bool inIndex = false)
-	*/
+	
+	//	dbDataType(int inType, int inN, string inName, 
+	//	bool inUnique = false, bool inPrimary = false, bool inIndex = false)
+	
 	test->clear();
 	test->push_back(new dbDataType(  DB_INT,1,"id", true, true, false));
 	test->push_back(new dbDataType(  DB_FLOAT, 1,"float",true, false, false));
@@ -242,3 +257,4 @@ int main()
 	system("pause");
 	return 0;
 }
+*/
