@@ -13,6 +13,7 @@ using namespace std;
 #define DB_CHAR 201902
 #define maxTableAttr 32
 #define maxCharLen 255
+#define maxRowLen 1000
 
 
 

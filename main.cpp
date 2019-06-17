@@ -4,6 +4,7 @@
 #include<recordManager/recordManager.h>
 #include<fstream>
 #include<table/Table.h>
+#include<interpreter\Interpreter.h>
 using namespace std;
 
 errorReporter * errorHandler;
@@ -17,6 +18,8 @@ void configInit()
 }
 int main()
 {
+	Interpreter::CMD();
+	return 0;
 	configInit();
 	bool x = true;
 	vector<dbDataType*> *test = new vector<dbDataType*>;
