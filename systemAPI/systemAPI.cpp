@@ -57,8 +57,8 @@ int systemAPI::find(string tableName, vector<Logic>* conditions, vector<vector<t
 		Index* index = catalog->getIndexByTableCol(tableName, logic.valName);
 		if (index == NULL) continue;
 		dbDataType* attr = table->findAttrByName(logic.valName);
-		
 	}
+	return 0;
 }
 
 vector<vector<tableValue>*> * systemAPI::select(string tableName, vector<Logic>* conditions)
@@ -184,11 +184,11 @@ bool systemAPI::insert(string tableName, vector<string> vList)  //Ŀǰ��û�
 	delete table;
 	return result;
 }
-bool systemAPI::remove(string tableName, vector<Logic>* conditions)
+int systemAPI::remove(string tableName, vector<Logic>* conditions)
 {
 	vector<int> * selectId = recorder->select(tableName, conditions);
 	recorder->deleteTableInstance(tableName,selectId);
-	return true;
+	return 0;
 }
 
 Table * systemAPI::getTable(string tableName)

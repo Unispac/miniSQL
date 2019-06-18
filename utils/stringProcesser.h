@@ -5,7 +5,11 @@
 #include<interpreter\syntaxError.h>
 #include<logic\Logic.h>
 #include<sstream>
+#include<utils/errorReporter.h>
 using namespace std;
+
+extern errorReporter* errorHandler;
+
 
 class stringProcesser
 {
@@ -99,16 +103,16 @@ public:
 	{
 		//int cnt[6], i;
 		if (x.find("<>") != -1)return NOT_EQUAL;
-		if (x.find("=") != -1)return EQUAL;
 		if (x.find(">=") != -1)return GREATER_EQUAL;
 		if (x.find("<=") != -1)return LESS_EQUAL;
+		if (x.find("=") != -1)return EQUAL;
 		if (x.find(">") != -1)return GREATER_THAN;
 		if (x.find("<") != -1)return LESS_THAN;
 		return -1;
 	}
-	static Logic* getLogic(string x, int cmpType, dbDataType * dbType)
+	static Logic* getLogic(string x, int cmpType, vector<dbDataType*>* list)
 	{
-		int dataType = dbType->dbType;
+		//int dataType = dbType->dbType;
 		int loc;
 		string left, right;
 		switch (cmpType)
@@ -153,9 +157,24 @@ public:
 		stringProcesser::trim(left);
 		stringProcesser::trim(right);
 		tableValue temp;
-
 		Logic * condition;
 		stringstream ss;
+		//cout << dataType << endl;
+
+		//cout << left << " " << right << endl;
+
+		int n = list->size();
+		int charLen;
+		int dataType=-1;
+		for(int i=0;i<n;i++)
+			if ((*list)[i]->name == left)
+			{
+				dataType = (*list)[i]->dbType;
+				charLen = (*list)[i]->n;
+				break;
+			}
+
+
 		switch (dataType)
 		{
 		case DB_INT:
@@ -180,9 +199,12 @@ public:
 				syntaxError::Error(); return NULL;
 			}
 			stringProcesser::getRidQuo(right);
-			temp.CHAR = new char[dbType->n];
+			temp.CHAR = new char[charLen];
 			memcpy(temp.CHAR, right.c_str(), right.size() + 1);
 			break;
+		default:
+			errorHandler->reportErrorCode(INVALID_ATTR_IN_CONDITION);
+			return NULL;
 		}
 		//
 		condition = new Logic(left, cmpType, temp);

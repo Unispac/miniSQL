@@ -102,7 +102,7 @@ vector<int>* recordManager::select(string tableName, vector<Logic>* conditions) 
 		for(auto logic: *conditions)
 		{
 			int pos = table->findPosByName(logic.valName);
-			dbDataType* attr = table->attrList[pos];
+			dbDataType* attr = (*(table->attrList))[pos];
 			if (attr->dbType == DB_INT)
 			{
 				int l = (*record)[pos].INT;

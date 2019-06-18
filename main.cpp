@@ -34,7 +34,11 @@ int main()
 
 	errorHandler = new errorReporter();
 	api = new systemAPI();
-	cout << Interpreter::getType(Interpreter::CMD()) << endl;
+	while (true)
+	{
+		cout << Interpreter::getType(Interpreter::CMD()) << endl;
+	}
+	
 	system("pause");
 	return 0;
 }
