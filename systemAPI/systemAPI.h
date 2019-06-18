@@ -49,7 +49,7 @@ public:
 	vector<vector<tableValue>*> * select(string tableName,vector<Logic>* conditions);
 
 	bool insert(string tableName, vector<string> vList);
-	bool remove(string tableName, vector<Logic>* conditions);
+	int remove(string tableName, vector<Logic>* conditions);
 
 	Table * getTable(string tableName);
 

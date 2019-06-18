@@ -12,6 +12,7 @@
 #include<interpreter/dropIndex.h>
 #include<interpreter/createIndex.h>
 #include<interpreter\Select.h>
+#include<interpreter/deleteRecord.h>
 using namespace std;
 
 class Interpreter
@@ -105,17 +106,38 @@ public:
 					}
 					else return "syntax error";
 				}
-				else
+				else if(size>=3)
 				{
-					if (temp[0] == "select")
+					if (temp[0] == "select"&&temp[2]=="from")
 					{
-						if (temp[2] != "from"||temp[4]!="where")return "syntax error";
 						int pos = x.find("where");
-						if (Select::get(temp[3], x.substr(pos + 5)) != NULL)return "select";
+						string conditionString;
+
+						if (pos == -1)
+						{
+							if (size != 4) { syntaxError::Error(); return "syntaxError"; }
+							conditionString = "";
+						}
+						else
+						{
+							if (size <= 5 || temp[4] != "where") { syntaxError::Error(); return "syntaxError"; }
+							conditionString = x.substr(pos + 5);
+						}
+						if (Select::get(temp[3], conditionString) != NULL)return "select";
 						else return "syntax error";
 					}
-					else if (temp[0] == "delete")
+					else if (temp[0] == "delete"&&temp[1]=="from")
 					{
+						string conditionString;
+						if (size == 3)conditionString = "";
+						else
+						{
+							if (size <= 4 || temp[3] != "where") { syntaxError::Error(); return "syntaxError"; }
+							int loc = x.find("where");
+							conditionString = x.substr(loc + 5);
+						}
+						if (deleteRecord::Delete(temp[2], conditionString) != -1)return "delete";
+						else return "syntax error";
 
 					}
 					else return "syntax error";

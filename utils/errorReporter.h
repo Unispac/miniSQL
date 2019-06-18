@@ -34,6 +34,7 @@ using namespace std;
 #define VALUE_TABLE_NOT_MATCH 25
 #define CHAR_LEN_EXCEED 26
 #define OPCODE_NOT_FOUND 27
+#define INVALID_ATTR_IN_CONDITION 28
 
 class errorReporter
 {
@@ -70,6 +71,7 @@ public:
 		errorTemplate[25] = " * error [25] : The value can't match the relation schema. ";
 		errorTemplate[26] = " * error [26] : The length of the varchar exceeds the upper bound.";	
 		errorTemplate[27] = " * error [27] : Syntax Error: The Opcode cannot be identified. ";
+		errorTemplate[28] = " * error [28] : Undefined attribute(s) in the condition statement. ";
 	}
 
 

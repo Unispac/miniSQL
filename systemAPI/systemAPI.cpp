@@ -62,6 +62,7 @@ int systemAPI::find(string tableName, vector<Logic>* conditions, vector<vector<t
 		Index* index = catalog->getIndexByTableCol(tableName, logic.valName);
 		if (index == NULL) continue;
 		dbDataType* attr = table->findAttrByName(logic.valName);
+<<<<<<< HEAD
 		char* key = new char[attr->getKeyLength()];
 		if (attr->dbType == DB_INT)
 			binaryFile::writeInt(key, logic.immediate.INT);
@@ -99,6 +100,10 @@ int systemAPI::find(string tableName, vector<Logic>* conditions, vector<vector<t
 	}
 
 	return ids->size();
+=======
+	}
+	return 0;
+>>>>>>> 19175ccc38674b2a91454acfa6a1ac3d3895783f
 }
 
 vector<vector<tableValue>*> * systemAPI::select(string tableName, vector<Logic>* conditions)
@@ -224,11 +229,11 @@ bool systemAPI::insert(string tableName, vector<string> vList)  //Ŀǰ��û�
 	delete table;
 	return result;
 }
-bool systemAPI::remove(string tableName, vector<Logic>* conditions)
+int systemAPI::remove(string tableName, vector<Logic>* conditions)
 {
 	vector<int> * selectId = recorder->select(tableName, conditions);
 	recorder->deleteTableInstance(tableName,selectId);
-	return true;
+	return 0;
 }
 
 Table * systemAPI::getTable(string tableName)

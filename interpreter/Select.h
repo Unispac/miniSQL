@@ -13,32 +13,47 @@ class Select
 public:
 	static vector<vector<tableValue>*> * get(string tableName, string conditionString)
 	{
+	
 		stringProcesser::trim(tableName);
 		stringProcesser::trim(conditionString);
-		cout << conditionString << endl;
 		Table * table = api->getTable(tableName);
+		if (table == NULL)return NULL;
 		//vector<dbDataType*> * attrList;
-
 		vector<dbDataType*> *attrList = table->attrList;
-		vector<string> sCondition = stringProcesser::split(conditionString, "and");
-		int size = sCondition.size();
-		Logic * tCondition;
 		vector<Logic> * condition = new vector<Logic>;
-		for (int i = 0; i < size; i++)
+
+		if (!conditionString.empty())
 		{
-			int type = stringProcesser::getConditionType(sCondition[i]);
-			if (type == -1) { syntaxError::Error(); return NULL; }
-			tCondition = stringProcesser::getLogic(sCondition[i], type, (*attrList)[i]);
-			if (tCondition == NULL)
+			vector<string> sCondition = stringProcesser::split(conditionString, "and");
+			int size = sCondition.size();
+			Logic * tCondition;
+		
+			for (int i = 0; i < size; i++)
 			{
-				syntaxError::Error(); 
-				int s = condition->size();
-				delete condition;
-				return NULL;
+				int type = stringProcesser::getConditionType(sCondition[i]);
+
+				if (type == -1) { syntaxError::Error(); return NULL; }
+				
+				tCondition = stringProcesser::getLogic(sCondition[i], type, attrList);
+				if (tCondition == NULL)
+				{
+					syntaxError::Error();
+					int s = condition->size();
+					delete condition;
+					return NULL;
+				}
+				condition->push_back(*tCondition);
+				delete tCondition;
 			}
-			condition->push_back(*tCondition);
-			delete tCondition;
 		}
+
+		/*int kk = condition->size();
+		for(int i = 0;i<kk;i++)
+		{
+			cout << (*condition)[i].valName << " " << (*condition)[i].opcode << " ";
+			cout << (*condition)[i].immediate.INT<< endl;
+		}*/
+
 		vector<vector<tableValue>*> * result = api->select(tableName, condition);
 		delete condition;
 		return result;
