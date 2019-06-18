@@ -35,6 +35,8 @@ using namespace std;
 #define CHAR_LEN_EXCEED 26
 #define OPCODE_NOT_FOUND 27
 #define INVALID_ATTR_IN_CONDITION 28
+#define ATTR_NULL 29
+#define ATTR_DUPLICATE 30
 
 class errorReporter
 {
@@ -72,6 +74,8 @@ public:
 		errorTemplate[26] = " * error [26] : The length of the varchar exceeds the upper bound.";	
 		errorTemplate[27] = " * error [27] : Syntax Error: The Opcode cannot be identified. ";
 		errorTemplate[28] = " * error [28] : Undefined attribute(s) in the condition statement. ";
+		errorTemplate[29] = " * error [29] : Primary/Unique attribute cannot have null value. ";
+		errorTemplate[30] = " * error [30] : Duplicate values exist on Primary/Unique attribute. ";
 	}
 
 

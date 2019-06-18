@@ -92,7 +92,7 @@ bool recordManager::checkRecord(Table* table, vector<tableValue>* record, vector
 	for(auto logic: *conditions)
 	{
 		int pos = table->findPosByName(logic.valName);
-		dbDataType* attr = table->attrList[pos];
+		dbDataType* attr = table->attrList->at(pos);
 		if (attr->dbType == DB_INT)
 		{
 			int l = (*record)[pos].INT;
@@ -147,4 +147,41 @@ vector<tableValue> * recordManager::getRecordById(string tableName,int id)
 	vector<tableValue> * temp = file->getRecord(id);
 	delete file;
 	return temp;
+}
+
+bool recordManager::checkDuplicate(string tableName, vector<tableValue>* record)
+{
+	Table* table = catalog->getTable(tableName);
+	tableFile* file = new tableFile(tableName);
+	int maxId = file->getMaxId();
+	bool noDuplicate = true;
+	for (int i = 0; i <= maxId; i++)
+	{
+		vector<tableValue> * tmp = file->getRecord(i, false);
+		if (tmp == NULL) continue;
+		for (int j = 0; j < (*(table->attrList)).size(); j++)
+		{
+			dbDataType* attr = table->attrList->at(j);
+			if (!attr->primary && !attr->unique) continue;
+			if (attr->dbType == DB_INT)
+			{
+				if ((*record)[j].INT == (*tmp)[j].INT)
+					noDuplicate = false;
+			}
+			else if (attr->dbType == DB_FLOAT)
+			{
+				if ((*record)[j].FLOAT == (*tmp)[j].FLOAT)
+					noDuplicate = false;
+			}
+			else
+			{
+				int len = attr->getKeyLength();
+				if (Logic::compareChar(record->at(j).CHAR, tmp->at(j).CHAR, len) == EQUAL)
+					noDuplicate = false;
+			}
+			if (!noDuplicate) break;
+		}
+		if (!noDuplicate) break;
+	}
+	return noDuplicate;
 }

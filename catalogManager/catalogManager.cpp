@@ -249,7 +249,7 @@ bool catalogManager::createIndex(string indexName, string TableName, string colN
 	bool unique;
 	if (attr != NULL)
 	{
-		if (!attr->unique)
+		if (!attr->unique && !attr->primary)
 		{
 			errorHandler->reportErrorCode(NOT_UNIQUE);
 			return false;

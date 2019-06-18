@@ -27,14 +27,28 @@ systemAPI::~systemAPI()
 
 bool systemAPI::createTable(string tableName, vector<dbDataType*>*attr)
 {
-
 	if(!catalog->createTable(tableName, attr))return false;
+	for (auto col : *attr)
+	{
+		if (col->primary)
+		{
+			createIndex(string("primary_index_of_") + tableName, tableName, col->name);
+			break;
+		}
+	}
 	if(!recorder->createTable(tableName))return false;
 	return true;
 }
 
 bool systemAPI::dropTable(string tableName)
 {
+	Table* table = catalog->getTable(tableName);
+	for(auto colName: *(table->attributesHaveIndex))
+	{
+		Index* index = catalog->getIndexByTableCol(tableName, colName);
+		dropIndex(index->getName());
+		delete index;
+	}
 	if(!catalog->dropTable(tableName))return false;
 	if(!recorder->dropTable(tableName))return false;
 	return true;
@@ -77,7 +91,7 @@ int systemAPI::find(string tableName, vector<Logic>* conditions, vector<vector<t
 		if (id < 0) ret = 0;
 		else
 		{
-			vector<tableValue>* record = recorder->getRecordById(id);
+			vector<tableValue>* record = recorder->getRecordById(tableName, id);
 			if (recorder->checkRecord(table, record, conditions))
 			{
 				rst->push_back(record);
@@ -96,7 +110,7 @@ int systemAPI::find(string tableName, vector<Logic>* conditions, vector<vector<t
 	for(auto id: *_)
 	{
 		ids->push_back(id);
-		rst->push_back(recorder->getRecordById(id));
+		rst->push_back(recorder->getRecordById(tableName, id));
 	}
 
 	return ids->size();
@@ -132,12 +146,40 @@ vector<vector<tableValue>*> * systemAPI::select(string tableName, vector<Logic>*
 	return rst;
 }
 
+void writeKey(dbDataType* attr, char* key, tableValue v)
+{
+	if (attr->dbType == DB_INT)
+		binaryFile::writeInt(key, v.INT);
+	else if (attr->dbType == DB_FLOAT)
+		binaryFile::writeFloat(key, v.FLOAT);
+	else
+		binaryFile::writeChar(key, v.CHAR, attr->getKeyLength());
+}
+
 bool systemAPI::insert(string tableName, vector<string> vList)  //Ŀǰ��û����Լ�����
 {
 	Table * table = catalog->getTable(tableName);
 	
 	if (table == NULL)return false;
 	vector<dbDataType*> * attrList = table->attrList;
+	vector<bool>* isNULL = new vector<bool>;
+	for (int i = 0; i < vList.size(); i++)
+		isNULL->push_back(vList[i] == "" ? true : false);
+	bool allHaveIndex = true;
+	for (int i = 0; i < table->attrList->size(); i++)
+	{
+		dbDataType* attr = (*(table->attrList))[i];
+		if (!attr->primary && !attr->unique) continue;
+		if ((*isNULL)[i])
+		{
+			errorHandler->reportErrorCode(ATTR_NULL);
+			return false;
+		}
+		Index* index = catalog->getIndexByTableCol(tableName, attr->name);
+		if (index == NULL)
+			allHaveIndex = false;
+	}
+
 	vector<tableValue> * value = new vector<tableValue>;
 	tableValue x;
 
@@ -147,6 +189,7 @@ bool systemAPI::insert(string tableName, vector<string> vList)  //Ŀǰ��û�
 		errorHandler->reportErrorCode(VALUE_TABLE_NOT_MATCH);
 		return false;
 	}
+
 	//vector<tableValue>* value
 	for (int i = 0; i < size; i++)
 	{
@@ -202,7 +245,48 @@ bool systemAPI::insert(string tableName, vector<string> vList)  //Ŀǰ��û�
 			}
 		}
 	}
-	bool result =recorder->insertTableInstance(tableName, value);
+
+	bool noDuplicate = true;
+	if (allHaveIndex)
+	{
+		for (int i = 0; i < table->attrList->size(); i++)
+		{
+			dbDataType* attr = table->attrList->at(i);
+			if (!attr->primary && !attr->unique) continue;
+			Index* index = catalog->getIndexByTableCol(tableName, attr->name);
+			char* key = new char[attr->getKeyLength()];
+			writeKey(attr, key, value->at(i));
+			int pos = indexer->find(index->getName(), key);
+			if (pos >= 0)
+			{
+				noDuplicate = false;
+				break;
+			}
+		}
+	}
+	else
+		noDuplicate = recorder->checkDuplicate(tableName, value);
+
+	if (!noDuplicate)
+	{
+		errorHandler->reportErrorCode(ATTR_DUPLICATE);
+		return false;
+	}
+
+	int id = recorder->insertTableInstance(tableName, value);
+	for (int i = 0; i < table->attrList->size(); i++)
+	{
+		dbDataType* attr = table->attrList->at(i);
+		if (!attr->primary && !attr->unique) continue;
+		Index* index = catalog->getIndexByTableCol(tableName, attr->name);
+		if (index != NULL)
+		{
+			char* key = new char[attr->getKeyLength()];
+			writeKey(attr, key, value->at(i));
+			indexer->insert(index->getName(), key, id);
+		}
+	}
+
 	char *temp;
 	for (int i = 0; i < size; i++)
 	{
@@ -217,7 +301,7 @@ bool systemAPI::insert(string tableName, vector<string> vList)  //Ŀǰ��û�
 	}
 	delete value;
 	delete table;
-	return result;
+	return id >= 0;
 }
 
 int systemAPI::remove(string tableName, vector<Logic>* conditions)
@@ -241,12 +325,7 @@ int systemAPI::remove(string tableName, vector<Logic>* conditions)
 		Index* index = catalog->getIndexByTableCol(table->name, indexCol);
 		for(auto record: *rst)
 		{
-			if (attr->dbType == DB_INT)
-				binaryFile::writeInt(key, (*record)[pos].INT);
-			else if (attr->dbType == DB_FLOAT)
-				binaryFile::writeFloat(key, (*record)[pos].FLOAT);
-			else
-				binaryFile::writeChar(key, (*record)[pos].CHAR, attr->getKeyLength());
+			writeKey(attr, key, record->at(pos));
 			indexer->remove(index->getName(), key);
 		}
 	}

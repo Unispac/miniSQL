@@ -22,6 +22,7 @@ public:
 	vector<int>* select(string tableName,vector<Logic>* conditions);                              //һ��condition������ѯ��
 	bool checkRecord(Table* table, vector<tableValue>* record, vector<Logic>* conditions);
 	vector<tableValue> * getRecordById(string tableName,int id);
+	bool checkDuplicate(string tableName, vector<tableValue>* record);
 private:
 	catalogManager *catalog;
 	bufferManager *buffer;
