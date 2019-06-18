@@ -11,6 +11,7 @@
 #include<interpreter/dropTable.h>
 #include<interpreter/dropIndex.h>
 #include<interpreter/createIndex.h>
+#include<interpreter\Select.h>
 using namespace std;
 
 class Interpreter
@@ -54,6 +55,7 @@ public:
 			x = x.substr(head + 1, tail - head-1);
 			vector<string> temp = stringProcesser::split(y, " ");
 			int size = temp.size();
+			for (int k = 0; k < size; k++)stringProcesser::trim(temp[k]);
 
 			if (temp[0] == "create")
 			{
@@ -83,6 +85,8 @@ public:
 		{
 			vector<string> temp = stringProcesser::split(x, " ");
 			int size = temp.size();
+			for (int k = 0; k < size; k++)stringProcesser::trim(temp[k]);
+
 			if (size == 0)return "syntax error";
 			else
 			{
@@ -103,7 +107,18 @@ public:
 				}
 				else
 				{
-					return "select or delete";
+					if (temp[0] == "select")
+					{
+						if (temp[2] != "from"||temp[4]!="where")return "syntax error";
+						int pos = x.find("where");
+						if (Select::get(temp[3], x.substr(pos + 5)) != NULL)return "select";
+						else return "syntax error";
+					}
+					else if (temp[0] == "delete")
+					{
+
+					}
+					else return "syntax error";
 				}
 			}
 		}

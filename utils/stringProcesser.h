@@ -2,6 +2,9 @@
 #define stringProcesser_H
 #include<vector>
 #include<string>
+#include<interpreter\syntaxError.h>
+#include<logic\Logic.h>
+#include<sstream>
 using namespace std;
 
 class stringProcesser
@@ -10,20 +13,19 @@ public:
 	static vector<string> split(const string& str, const string& delim) 
 	{
 		vector<string> res;
-		if ("" == str) return res;
-		//先将要切割的字符串从string类型转换为char*类型  
-		char * strs = new char[str.length() + 1]; //不要忘了  
-		strcpy(strs, str.c_str());
-
-		char * d = new char[delim.length() + 1];
-		strcpy(d, delim.c_str());
-
-		char *p = strtok(strs, d);
-		while (p) {
-			string s = p; //分割得到的字符串转换为string类型  
-			res.push_back(s); //存入结果数组  
-			p = strtok(NULL, d);
+		if ("" == str||str==delim) return res;
+		string x = str;
+		trim(x);
+		int t = x.find(delim);
+		int L = delim.length();
+		while (t != -1)
+		{
+			res.push_back(x.substr(0, t));
+			x = x.substr(t+L);
+			trim(x);
+			t = x.find(delim);
 		}
+		if (x.length() > 0)res.push_back(x);
 		return res;
 	}
 	static void trim(string &s)
@@ -86,13 +88,105 @@ public:
 	}
 	static bool isInt(string x)
 	{
-		
 		int len = x.size();
 		for (int i = 0; i < len; i++)
 		{
 			if (x[i]<'0' || x[i]>'9')return false;
 		}
 		return true;
+	}
+	static int getConditionType(string x)
+	{
+		//int cnt[6], i;
+		if (x.find("<>") != -1)return NOT_EQUAL;
+		if (x.find("=") != -1)return EQUAL;
+		if (x.find(">=") != -1)return GREATER_EQUAL;
+		if (x.find("<=") != -1)return LESS_EQUAL;
+		if (x.find(">") != -1)return GREATER_THAN;
+		if (x.find("<") != -1)return LESS_THAN;
+		return -1;
+	}
+	static Logic* getLogic(string x, int cmpType, dbDataType * dbType)
+	{
+		int dataType = dbType->dbType;
+		int loc;
+		string left, right;
+		switch (cmpType)
+		{
+		case EQUAL:
+			loc = x.find("=");
+			if (loc == -1) { syntaxError::Error(); return NULL; }
+			left = x.substr(0, loc);
+			right = x.substr(loc + 1);
+			break;
+		case NOT_EQUAL:
+			loc = x.find("<>");
+			if (loc == -1) { syntaxError::Error(); return NULL; }
+			left = x.substr(0, loc);
+			right = x.substr(loc + 2);
+			break;
+		case GREATER_THAN:
+			loc = x.find(">");
+			if (loc == -1) { syntaxError::Error(); return NULL; }
+			left = x.substr(0, loc);
+			right = x.substr(loc + 1);
+			break;
+		case LESS_THAN:
+			loc = x.find("<");
+			if (loc == -1) { syntaxError::Error(); return NULL; }
+			left = x.substr(0, loc);
+			right = x.substr(loc + 1);
+			break;
+		case GREATER_EQUAL:
+			loc = x.find(">=");
+			if (loc == -1) { syntaxError::Error(); return NULL; }
+			left = x.substr(0, loc);
+			right = x.substr(loc + 2);
+			break;
+		case LESS_EQUAL:
+			loc = x.find("<=");
+			if (loc == -1) { syntaxError::Error(); return NULL; }
+			left = x.substr(0, loc);
+			right = x.substr(loc + 2);
+			break;
+		}
+		stringProcesser::trim(left);
+		stringProcesser::trim(right);
+		tableValue temp;
+
+		Logic * condition;
+		stringstream ss;
+		switch (dataType)
+		{
+		case DB_INT:
+			if (stringProcesser::isInt(right) == false)
+			{
+				syntaxError::Error(); return NULL;
+			}
+			ss << right;
+			ss >> temp.INT;	
+			break;
+		case DB_FLOAT:
+			if (stringProcesser::isFloat(right) == false)
+			{
+				syntaxError::Error(); return NULL;
+			}
+			ss << right;
+			ss >> temp.FLOAT;
+			break;
+		case DB_CHAR:
+			if (stringProcesser::isChar(right) == false)
+			{
+				syntaxError::Error(); return NULL;
+			}
+			stringProcesser::getRidQuo(right);
+			temp.CHAR = new char[dbType->n];
+			memcpy(temp.CHAR, right.c_str(), right.size() + 1);
+			break;
+		}
+		//
+		condition = new Logic(left, cmpType, temp);
+		return condition;
 	}
 };
 

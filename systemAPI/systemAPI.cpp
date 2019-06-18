@@ -47,7 +47,7 @@ bool systemAPI::dropIndex(string indexName)
 	return true;
 }
 
-vector<vector<tableValue>*> * systemAPI::selet(string tableName, vector<Logic>* conditions)
+vector<vector<tableValue>*> * systemAPI::select(string tableName, vector<Logic>* conditions)
 {
 	vector<int> * selectId = recorder->select(tableName, conditions);
 	vector<vector<tableValue>*>* result = new vector<vector<tableValue>*>;
@@ -152,4 +152,9 @@ bool systemAPI::remove(string tableName, vector<Logic>* conditions)
 	vector<int> * selectId = recorder->select(tableName, conditions);
 	recorder->deleteTableInstance(tableName,selectId);
 	return true;
+}
+
+Table * systemAPI::getTable(string tableName)
+{
+	return catalog->getTable(tableName);
 }
