@@ -7,7 +7,9 @@ class syntaxError
 public:
 	static void Error()
 	{
-		cout << "SYTAX ERROR " << endl;
+		cout << endl;
+		cout << "[Syntax Error] Check again !!!" << endl;
+		cout << endl;
 		return;
 		//exit(0);
 	}

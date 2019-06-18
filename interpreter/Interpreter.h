@@ -13,7 +13,10 @@
 #include<interpreter/createIndex.h>
 #include<interpreter\Select.h>
 #include<interpreter/deleteRecord.h>
+#include<table/Table.h>
 using namespace std;
+
+extern systemAPI * api;
 
 class Interpreter
 {
@@ -43,7 +46,8 @@ public:
 		return x;
 	}
 
-	static string getType(string x)
+
+	static void Execute(string x)
 	{
 		string y = x;
 		int head = x.find_first_of('(');
@@ -52,7 +56,11 @@ public:
 		{
 			y = x.substr(0, head);
 			int tail = x.find_last_of(')');
-			if (tail == -1)return "syntax error";
+			if (tail == -1)
+			{
+				syntaxError::Error();
+				return;
+			}
 			x = x.substr(head + 1, tail - head-1);
 			vector<string> temp = stringProcesser::split(y, " ");
 			int size = temp.size();
@@ -62,24 +70,37 @@ public:
 			{
 				if (size == 3 && temp[1] == "table")
 				{
-					if(createTable::create(temp[2], x))return "create table";
-					else return "syntax error";
+					//cout << "aaaa!!" << endl;
+					if (createTable::create(temp[2], x))createTableResult(true, temp[2]);
+					else createTableResult(false, temp[2]);
+					return;
 				}
 				else if (size == 5 && temp[1] == "index" && temp[3] == "on")
 				{
-					if(createIndex::create(temp[2],temp[4]))return "create index";
-					else return "syntax error";
+					//cout << "aha??" << endl;
+					if (createIndex::create(temp[2], temp[4],x))createIndexResult(true, temp[2]);
+					else createIndexResult(false, temp[2]);
+					return;
 				}
-				else return "syntax error";
+				else
+				{
+					syntaxError::Error();
+					return;
+				}
 			}
 			else if (temp[0] == "insert")
 			{
 				if (size == 4 && temp[1] == "into" &&temp[3]=="values")
 				{
-					if(insertRecord::insert(temp[2], x))return "insert record";
-					else return "syntax error";
+					if (insertRecord::insert(temp[2], x))insertResult(true);
+					else insertResult(false);
+					return;
 				}
-				else return "syntax error";
+				else
+				{
+					syntaxError::Error();
+					return;
+				}
 			}
 		}
 		else
@@ -88,23 +109,37 @@ public:
 			int size = temp.size();
 			for (int k = 0; k < size; k++)stringProcesser::trim(temp[k]);
 
-			if (size == 0)return "syntax error";
+			if (size == 0)
+			{
+				syntaxError::Error();
+				return;
+			}
 			else
 			{
 				if (temp[0] == "drop")
 				{
-					if (size != 3)return "syntax error";
+					if (size != 3)
+					{
+						syntaxError::Error();
+						return;
+					}
 					else if (temp[1] == "table")
 					{
-						if(dropTable::drop(temp[2]))return "drop table";
-						else return "syntax error";
+						if (dropTable::drop(temp[2]))dropTableResult(true, temp[2]);
+						else dropTableResult(false, temp[2]);
+						return;
 					}
 					else if (temp[1] == "index")
 					{
-						if(dropIndex::drop(temp[2]))return "drop index";
-						else return "syntax error";
+						if (dropIndex::drop(temp[2]))dropIndexResult(true, temp[2]);
+						else dropIndexResult(false, temp[2]);
+						return;
 					}
-					else return "syntax error";
+					else
+					{
+						syntaxError::Error();
+						return;
+					}
 				}
 				else if(size>=3)
 				{
@@ -115,16 +150,16 @@ public:
 
 						if (pos == -1)
 						{
-							if (size != 4) { syntaxError::Error(); return "syntaxError"; }
+							if (size != 4) { syntaxError::Error(); return; }
 							conditionString = "";
 						}
 						else
 						{
-							if (size <= 5 || temp[4] != "where") { syntaxError::Error(); return "syntaxError"; }
+							if (size <= 5 || temp[4] != "where") { syntaxError::Error(); return; }
 							conditionString = x.substr(pos + 5);
 						}
-						if (Select::get(temp[3], conditionString) != NULL)return "select";
-						else return "syntax error";
+						selectResult(Select::get(temp[3], conditionString),temp[3]);
+						return;
 					}
 					else if (temp[0] == "delete"&&temp[1]=="from")
 					{
@@ -132,22 +167,116 @@ public:
 						if (size == 3)conditionString = "";
 						else
 						{
-							if (size <= 4 || temp[3] != "where") { syntaxError::Error(); return "syntaxError"; }
+							if (size <= 4 || temp[3] != "where") { syntaxError::Error(); return; }
 							int loc = x.find("where");
 							conditionString = x.substr(loc + 5);
 						}
-						if (deleteRecord::Delete(temp[2], conditionString) != -1)return "delete";
-						else return "syntax error";
-
+						deleteResult(deleteRecord::Delete(temp[2], conditionString));
+						return;
 					}
-					else return "syntax error";
+					else
+					{
+						syntaxError::Error();
+						return;
+					}
 				}
 			}
 		}
+		return;
+	}
 
-		
+private:
+	static void createTableResult(bool success,string tableName)
+	{
+		cout << endl;
+		if (success)cout << "[Done] Successfully create table : " << tableName << endl;
+		else cout << "[Failed] Check again !!!" << endl;
+		cout << endl;
+	}
+	static void createIndexResult(bool success, string indexName)
+	{
+		cout << endl;
+		if (success)cout << "[Done] Successfully create index : " << indexName<< endl;
+		else cout << "[Failed] Check again !!!" << endl;
+		cout << endl;
+	}
+	static void insertResult(bool success)
+	{
+		cout << endl;
+		if (success)cout << "[Done] Insertion succeed !!! " << endl;
+		else cout << "[Failed] Check again !!!" << endl;
+		cout << endl;
+	}
+	static void dropTableResult(bool success, string tableName)
+	{
+		cout << endl;
+		if (success)cout << "[Done] Successfully drop table : " << tableName << endl;
+		else cout << "[Failed] Check again !!!" << endl;
+		cout << endl;
+	}
+	static void dropIndexResult(bool success, string indexName)
+	{
+		cout << endl;
+		if (success)cout << "[Done] Successfully drop index : " << indexName << endl;
+		else cout << "[Failed] Check again !!!" << endl;
+		cout << endl;
+	}
+	static void selectResult(vector<vector<tableValue>*> *result,string tableName)
+	{
+		cout << endl;
+		if(result==NULL)cout << "[Failed] Check again !!!" << endl;
+		else
+		{
+			Table *table = api->getTable(tableName);
+			vector<dbDataType*> * attrList = table->attrList;
+			dbDataType * temp;
+			int size = attrList->size();
+			cout << tableName << "_schema(";
+			for (int i = 0; i < size; i++)
+			{
+				temp = (*attrList)[i];
+				cout << temp->name;
+				if(i!=size-1)cout<< " , ";
+			}
+			cout << ");";
+			cout << endl;
 
-		return "";
+			int cnt = attrList->size();
+			vector<tableValue>* tempValue;
+	
+			for(int i=0;i<cnt;i++)
+			{
+				tempValue = (*result)[i];
+				for (int j = 0; j < size; j++)
+				{
+					temp = (*attrList)[j];
+					switch (temp->dbType)
+					{
+					case DB_INT:
+						cout << (*tempValue)[j].INT << "   ";
+						break;
+					case DB_FLOAT:
+						cout << (*tempValue)[j].FLOAT << "   ";
+						break;
+					case DB_CHAR:
+						cout << (*tempValue)[j].CHAR << "   ";
+						break;
+					}
+				}
+				cout << endl;
+			}
+		}
+		cout << endl;
+	}
+	static void deleteResult(int cnt)
+	{
+		cout << endl;
+		if (cnt==-1)cout << "[Failed] Check again !!!" << endl;
+		else
+		{
+			cout << "[Done] "<<cnt<<" records have been deleted" << endl;
+		}
+		cout << endl;
 	}
 };
 
