@@ -6,6 +6,7 @@
 #include <indexManager/indexManager.h>
 #include <table/tableFile.h>
 #include <recordManager/recordManager.h>
+#include <table/Table.h>
 
 extern errorReporter * errorHandler;
 
@@ -62,7 +63,6 @@ int systemAPI::find(string tableName, vector<Logic>* conditions, vector<vector<t
 		Index* index = catalog->getIndexByTableCol(tableName, logic.valName);
 		if (index == NULL) continue;
 		dbDataType* attr = table->findAttrByName(logic.valName);
-<<<<<<< HEAD
 		char* key = new char[attr->getKeyLength()];
 		if (attr->dbType == DB_INT)
 			binaryFile::writeInt(key, logic.immediate.INT);
@@ -100,10 +100,6 @@ int systemAPI::find(string tableName, vector<Logic>* conditions, vector<vector<t
 	}
 
 	return ids->size();
-=======
-	}
-	return 0;
->>>>>>> 19175ccc38674b2a91454acfa6a1ac3d3895783f
 }
 
 vector<vector<tableValue>*> * systemAPI::select(string tableName, vector<Logic>* conditions)
@@ -130,16 +126,10 @@ vector<vector<tableValue>*> * systemAPI::select(string tableName, vector<Logic>*
 		}
 	}
 
-	//
-	vector<int> * selectId = recorder->select(tableName, conditions);
-	vector<vector<tableValue>*>* result = new vector<vector<tableValue>*>;
-	int i, id, len = selectId->size();
-	for (i = 0; i < len; i++)
-	{
-		id = (*selectId)[i];
-		result->push_back(recorder->getRecordById(tableName,id));
-	}
-	return result;
+	vector<vector<tableValue>*>* rst = new vector<vector<tableValue>*>;
+	vector<int>* ids = new vector<int>;
+	int selectCount = find(tableName, conditions, rst, ids);
+	return rst;
 }
 
 bool systemAPI::insert(string tableName, vector<string> vList)  //Ŀǰ��û����Լ�����
@@ -229,11 +219,41 @@ bool systemAPI::insert(string tableName, vector<string> vList)  //Ŀǰ��û�
 	delete table;
 	return result;
 }
+
 int systemAPI::remove(string tableName, vector<Logic>* conditions)
 {
-	vector<int> * selectId = recorder->select(tableName, conditions);
-	recorder->deleteTableInstance(tableName,selectId);
-	return 0;
+	Table* table = getTable(tableName);
+	if (table == NULL)
+	{
+		errorHandler->reportErrorCode(NO_TABLE);
+		return 0;
+	}
+	vector<vector<tableValue>*>* rst = new vector<vector<tableValue>*>;
+	vector<int>* ids = new vector<int>;
+	int selectNum = find(tableName, conditions, rst, ids);
+
+	// update index
+	for(auto indexCol: *(table->attributesHaveIndex))
+	{
+		int pos = table->findPosByName(indexCol);
+		dbDataType* attr = (*(table->attrList))[pos];
+		char* key = new char[attr->getKeyLength()];
+		Index* index = catalog->getIndexByTableCol(table->name, indexCol);
+		for(auto record: *rst)
+		{
+			if (attr->dbType == DB_INT)
+				binaryFile::writeInt(key, (*record)[pos].INT);
+			else if (attr->dbType == DB_FLOAT)
+				binaryFile::writeFloat(key, (*record)[pos].FLOAT);
+			else
+				binaryFile::writeChar(key, (*record)[pos].CHAR, attr->getKeyLength());
+			indexer->remove(index->getName(), key);
+		}
+	}
+
+	// clear record
+	recorder->deleteTableInstance(tableName, ids);
+	return selectNum;
 }
 
 Table * systemAPI::getTable(string tableName)
