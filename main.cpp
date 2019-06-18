@@ -36,7 +36,7 @@ int main()
 	api = new systemAPI();
 	while (true)
 	{
-		cout << Interpreter::getType(Interpreter::CMD()) << endl;
+		Interpreter::Execute(Interpreter::CMD());
 	}
 	
 	system("pause");

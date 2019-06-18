@@ -51,6 +51,7 @@ bool systemAPI::dropTable(string tableName)
 	}
 	if(!catalog->dropTable(tableName))return false;
 	if(!recorder->dropTable(tableName))return false;
+	delete table;
 	return true;
 }
 
