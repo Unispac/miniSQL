@@ -94,11 +94,17 @@ bool tableFile::deleteRecord(int id,bool commit)
 	}
 	else
 	{
-		block->pin = true; //Èç¹û²»Á¢¼´Ð´»Ø£¬ÄÇÐèÒªËø×¡£¬·ÀÖ¹cache¶ªÊ§¡£
+		block->pin = true; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½Ø£ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½×¡ï¿½ï¿½ï¿½ï¿½Ö¹cacheï¿½ï¿½Ê§ï¿½ï¿½
 	}
 	return true;
 }
-vector<tableValue> * tableFile::getRecord(int id)
+
+int tableFile::getMaxId()
+{
+	return maxId;
+}
+
+vector<tableValue> * tableFile::getRecord(int id, bool reportWhenNULL)
 {
 	int blockId = (id/ recordNumPerBlock) + 1;
 	int offset = id% recordNumPerBlock;
@@ -115,8 +121,11 @@ vector<tableValue> * tableFile::getRecord(int id)
 	char mark;
 	memcpy(&mark, p, 1);
 	if (mark == 0)
-		errorHandler->reportErrorCode(RECORD_DOES_NOT_EXIST);
-
+	{
+		if (reportWhenNULL)
+			errorHandler->reportErrorCode(RECORD_DOES_NOT_EXIST);
+		return NULL;
+	}
 	vector<tableValue> * recordContent = new vector<tableValue>;
 	binaryFile::readTableValue(p, recordContent,table);
 	return recordContent;

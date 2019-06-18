@@ -1,7 +1,10 @@
-#include<recordManager/recordManager.h>
-#include<bufferManager/binaryFile.h>
-#include<table/tableFile.h>
-#include<utils/errorReporter.h>
+#include <recordManager/recordManager.h>
+#include <bufferManager/binaryFile.h>
+#include <table/tableFile.h>
+#include <utils/errorReporter.h>
+#include <table/Table.h>
+#include <config.h>
+
 extern errorReporter * errorHandler;
 
 recordManager::recordManager()
@@ -19,7 +22,7 @@ recordManager::~recordManager()
 bool recordManager::createTable(string tableName)
 {
 	string filePath = "data/" + tableName + ".mdb";
-	if (fopen(filePath.c_str(), "rb") == NULL)  //´´½¨±íÎÄ¼ş¼°Æä±íÍ·ÎÄ±¾
+	if (fopen(filePath.c_str(), "rb") == NULL)  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½Ä±ï¿½
 	{
 		FILE * file = fopen(filePath.c_str(), "ab+");
 		char * data = new char[blockSize];
@@ -34,7 +37,7 @@ bool recordManager::createTable(string tableName)
 	return true;
 }
 
-bool recordManager::dropTable(string tableName) // recorderÖ»¸ºÔğ¹ÜÀí±íÄÚÈİ.±íÍ·ĞÅÏ¢ÓÉcatalog¹Ü£¬Ë÷ÒıĞÅÏ¢ÓÉindex¹Ü¡£
+bool recordManager::dropTable(string tableName) // recorderÖ»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.ï¿½ï¿½Í·ï¿½ï¿½Ï¢ï¿½ï¿½catalogï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½indexï¿½Ü¡ï¿½
 {
 	string filePath = "data/" + tableName + ".mdb";
 	/*if (fopen(filePath.c_str(), "rb") == NULL)
@@ -46,14 +49,14 @@ bool recordManager::dropTable(string tableName) // recorderÖ»¸ºÔğ¹ÜÀí±íÄÚÈİ.±íÍ·
 	return true;
 }
 
-int recordManager::insertTableInstance(string tableName, vector<tableValue>* value)// Ã¿´ÎÖ»ĞèÒªÌí¼ÓÒ»Ìõ±íÏî£¬½«Öµ±íÁĞ³öÀ´¾ÍĞĞÁË¡£
+int recordManager::insertTableInstance(string tableName, vector<tableValue>* value)// Ã¿ï¿½ï¿½Ö»ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½î£¬ï¿½ï¿½Öµï¿½ï¿½ï¿½Ğ³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë¡ï¿½
 {
 	tableFile * file = new tableFile(tableName);
 	int ret = file->insertRecord(value);
 	delete file;
 	return ret;
 }
-bool recordManager::deleteTableInstance(string tableName, vector<int>* list)                                //ÏÈ²éÑ¯ÔÙ×öÉ¾³ı£¿  ²ßÂÔ£¿ ÓÃÒ»¸öÁ´±íÎ¬»¤Ìæ»»£¿ ÒªÇólist±ØĞë´ÓĞ¡µ½´óÅÅĞò¡£
+bool recordManager::deleteTableInstance(string tableName, vector<int>* list)                                //ï¿½È²ï¿½Ñ¯ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½ï¿½ï¿½  ï¿½ï¿½ï¿½Ô£ï¿½ ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î¬ï¿½ï¿½ï¿½æ»»ï¿½ï¿½ Òªï¿½ï¿½listï¿½ï¿½ï¿½ï¿½ï¿½Ğ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 {
 	tableFile * file = new tableFile(tableName);
 	int len = list->size();
@@ -83,12 +86,62 @@ bool recordManager::deleteTableInstance(string tableName, vector<int>* list)    
 	delete file;
 	return true;
 }
-vector<int>* recordManager::select(string tableName, vector<Logic>*)                              //Ò»¸öcondition±í£¬²éÑ¯£¬·µ»ØÒ»¸ö´ÓĞ¡µ½´óÅÅĞòµÄĞĞºÅ±í¡£ ÒÀÀµË÷Òı¡£¡£¡£
+
+// the validity of conditions is ensured in systemAPI
+vector<int>* recordManager::select(string tableName, vector<Logic>* conditions)                              //Ò»ï¿½ï¿½conditionï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¯ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ğ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ĞºÅ±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 {
-	return NULL;
+	vector<int>* ret = new vector<int>;
+	Table* table = catalog->getTable(tableName);
+	tableFile* file = new tableFile(tableName);
+	int maxId = file->getMaxId();
+	for(int i = 0; i <= maxId; i++)
+	{
+		vector<tableValue> * record = file->getRecord(i, false);
+		if (record == NULL) continue;
+		bool flag = true;
+		for(auto logic: *conditions)
+		{
+			int pos = table->findPosByName(logic.valName);
+			dbDataType* attr = table->attrList[pos];
+			if (attr->dbType == DB_INT)
+			{
+				int l = (*record)[pos].INT;
+				int r = logic.immediate.INT;
+				if (!logic.checkCondition(Logic::compareInt(l, r)))
+				{
+					flag = false;
+					break;
+				}
+			}
+			else if (attr->dbType == DB_FLOAT)
+			{
+				float l = (*record)[pos].FLOAT;
+				float r = logic.immediate.FLOAT;
+				if (!logic.checkCondition(Logic::compareFloat(l, r)))
+				{
+					flag = false;
+					break;
+				}
+			}
+			else 
+			{
+				int len = attr->n;
+				char* l = (*record)[pos].CHAR;
+				char* r = logic.immediate.CHAR;
+				if (!logic.checkCondition(Logic::compareChar(l, r, len)))
+				{
+					flag = false;
+					break;
+				}
+			}
+
+			if (flag) ret->push_back(i);
+		}
+	}
+	return ret;
 }
 
-bool recordManager::defragmentation(string tableName)  //ËéÆ¬ÕûÀí£¬ĞÄÇéºÃÔÙĞ´
+bool recordManager::defragmentation(string tableName)  //ï¿½ï¿½Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğ´
 {
 	return false;
 }
