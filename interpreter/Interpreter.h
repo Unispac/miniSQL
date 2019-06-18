@@ -241,7 +241,7 @@ private:
 			cout << ");";
 			cout << endl;
 
-			int cnt = attrList->size();
+			int cnt = result->size();
 			vector<tableValue>* tempValue;
 	
 			for(int i=0;i<cnt;i++)
