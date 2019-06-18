@@ -1,5 +1,6 @@
-#include<systemAPI\systemAPI.h>
+#include<systemAPI/systemAPI.h>
 #include<utils/stringProcesser.h>
+#include <catalogManager/catalogManager.h>
 #include<sstream>
 extern errorReporter * errorHandler;
 
@@ -47,8 +48,43 @@ bool systemAPI::dropIndex(string indexName)
 	return true;
 }
 
-vector<vector<tableValue>*> * systemAPI::selet(string tableName, vector<Logic>* conditions)
+int systemAPI::find(string tableName, vector<Logic>* conditions, vector<vector<tableValue>*>* rst, vector<int>* ids)
 {
+	Table* table = catalog->getTable(tableName);
+	for(auto logic: *conditions)
+	{
+		if (logic.opcode != EQUAL) continue;
+		Index* index = catalog->getIndexByTableCol(tableName, logic.valName);
+		if (index == NULL) continue;
+		dbDataType* attr = table->findAttrByName(logic.valName);
+		
+	}
+}
+vector<vector<tableValue>*> * systemAPI::select(string tableName, vector<Logic>* conditions)
+{
+	// check tablename and conditions_op and conditions_attr
+	Table* table = catalog->getTable(tableName);
+	if (table == NULL)
+	{
+		errorHandler->reportErrorCode(NO_TABLE);
+		return NULL;
+	}
+
+	for(auto logic: *conditions)
+	{
+		if (logic.opcode < EQUAL || logic.opcode > GREATER_EQUAL)
+		{
+			errorHandler->reportErrorCode(OPCODE_NOT_FOUND);
+			return NULL;
+		}
+		if (table->findAttrByName(logic.valName) == NULL)
+		{
+			errorHandler->reportErrorCode(ATTR_NOT_FOUND);
+			return NULL;
+		}
+	}
+
+	//
 	vector<int> * selectId = recorder->select(tableName, conditions);
 	vector<vector<tableValue>*>* result = new vector<vector<tableValue>*>;
 	int i, id, len = selectId->size();
@@ -60,7 +96,7 @@ vector<vector<tableValue>*> * systemAPI::selet(string tableName, vector<Logic>* 
 	return result;
 }
 
-bool systemAPI::insert(string tableName, vector<string> vList)  //Ä¿Ç°»¹Ã»ÓÐ×öÔ¼Êø¼ì²é
+bool systemAPI::insert(string tableName, vector<string> vList)  //Ä¿Ç°ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½
 {
 	Table * table = catalog->getTable(tableName);
 	

@@ -46,7 +46,7 @@ public:
 	/*
 		ͬcreateIndex.
 	*/
-	vector<vector<tableValue>*> * selet(string tableName,vector<Logic>* conditions);
+	vector<vector<tableValue>*> * select(string tableName,vector<Logic>* conditions);
 
 	bool insert(string tableName, vector<string> vList);
 	bool remove(string tableName, vector<Logic>* conditions);
@@ -56,6 +56,8 @@ private:
 	recordManager * recorder;
 	catalogManager * catalog;
 	indexManager * indexer;
+
+	int find(string tableName, vector<Logic>* conditions, vector<vector<tableValue>*>* rst, vector<int>* ids);
 };
 
 #endif

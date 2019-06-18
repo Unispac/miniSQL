@@ -33,6 +33,7 @@ using namespace std;
 #define ATTR_NOT_FOUND 24
 #define VALUE_TABLE_NOT_MATCH 25
 #define CHAR_LEN_EXCEED 26
+#define OPCODE_NOT_FOUND 27
 
 class errorReporter
 {
@@ -66,8 +67,9 @@ public:
 		errorTemplate[22] = " * error [22] : The attribute on which index is built is not unique. ";
 		errorTemplate[23] = " * error [23] : An index has already been built on the attribute. ";
 		errorTemplate[24] = " * error [24] : No Attribute with given name. ";
-		errorTemplate[25] = " * error [24] : The value can't match the relation schema. ";
-		errorTemplate[26] = " * error [25] : The length of the varchar exceeds the upper bound.";	
+		errorTemplate[25] = " * error [25] : The value can't match the relation schema. ";
+		errorTemplate[26] = " * error [26] : The length of the varchar exceeds the upper bound.";	
+		errorTemplate[27] = " * error [27] : Syntax Error: The Opcode cannot be identified. ";
 	}
 
 
