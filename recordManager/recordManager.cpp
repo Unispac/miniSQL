@@ -87,6 +87,38 @@ bool recordManager::deleteTableInstance(string tableName, vector<int>* list)    
 	return true;
 }
 
+bool recordManager::checkRecord(Table* table, vector<tableValue>* record, vector<Logic>* conditions)
+{	
+	for(auto logic: *conditions)
+	{
+		int pos = table->findPosByName(logic.valName);
+		dbDataType* attr = table->attrList[pos];
+		if (attr->dbType == DB_INT)
+		{
+			int l = (*record)[pos].INT;
+			int r = logic.immediate.INT;
+			if (!logic.checkCondition(Logic::compareInt(l, r)))
+				return false;
+		}
+		else if (attr->dbType == DB_FLOAT)
+		{
+			float l = (*record)[pos].FLOAT;
+			float r = logic.immediate.FLOAT;
+			if (!logic.checkCondition(Logic::compareFloat(l, r)))
+				return false;
+		}
+		else 
+		{
+			int len = attr->n;
+			char* l = (*record)[pos].CHAR;
+			char* r = logic.immediate.CHAR;
+			if (!logic.checkCondition(Logic::compareChar(l, r, len)))
+				return false;
+		}
+	}
+	return true;
+}
+
 // the validity of conditions is ensured in systemAPI
 vector<int>* recordManager::select(string tableName, vector<Logic>* conditions)                              //һ��condition������ѯ������һ����С����������кű��� ��������������
 {
@@ -98,45 +130,8 @@ vector<int>* recordManager::select(string tableName, vector<Logic>* conditions) 
 	{
 		vector<tableValue> * record = file->getRecord(i, false);
 		if (record == NULL) continue;
-		bool flag = true;
-		for(auto logic: *conditions)
-		{
-			int pos = table->findPosByName(logic.valName);
-			dbDataType* attr = table->attrList[pos];
-			if (attr->dbType == DB_INT)
-			{
-				int l = (*record)[pos].INT;
-				int r = logic.immediate.INT;
-				if (!logic.checkCondition(Logic::compareInt(l, r)))
-				{
-					flag = false;
-					break;
-				}
-			}
-			else if (attr->dbType == DB_FLOAT)
-			{
-				float l = (*record)[pos].FLOAT;
-				float r = logic.immediate.FLOAT;
-				if (!logic.checkCondition(Logic::compareFloat(l, r)))
-				{
-					flag = false;
-					break;
-				}
-			}
-			else 
-			{
-				int len = attr->n;
-				char* l = (*record)[pos].CHAR;
-				char* r = logic.immediate.CHAR;
-				if (!logic.checkCondition(Logic::compareChar(l, r, len)))
-				{
-					flag = false;
-					break;
-				}
-			}
-
-			if (flag) ret->push_back(i);
-		}
+		if (checkRecord(table, record, conditions)) 
+			ret->push_back(i);
 	}
 	return ret;
 }

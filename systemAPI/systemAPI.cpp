@@ -2,6 +2,11 @@
 #include<utils/stringProcesser.h>
 #include <catalogManager/catalogManager.h>
 #include<sstream>
+#include <bufferManager/binaryFile.h>
+#include <indexManager/indexManager.h>
+#include <table/tableFile.h>
+#include <recordManager/recordManager.h>
+
 extern errorReporter * errorHandler;
 
 systemAPI::systemAPI()
@@ -57,8 +62,43 @@ int systemAPI::find(string tableName, vector<Logic>* conditions, vector<vector<t
 		Index* index = catalog->getIndexByTableCol(tableName, logic.valName);
 		if (index == NULL) continue;
 		dbDataType* attr = table->findAttrByName(logic.valName);
-		
+		char* key = new char[attr->getKeyLength()];
+		if (attr->dbType == DB_INT)
+			binaryFile::writeInt(key, logic.immediate.INT);
+		else if (attr->dbType == DB_FLOAT) 
+			binaryFile::writeFloat(key, logic.immediate.FLOAT);
+		else
+			binaryFile::writeChar(key, logic.immediate.CHAR, attr->n);
+		if (key == NULL) return 0;
+		int id = indexer->find(index->getName(), key);
+
+		int ret;
+		if (id < 0) ret = 0;
+		else
+		{
+			vector<tableValue>* record = recorder->getRecordById(id);
+			if (recorder->checkRecord(table, record, conditions))
+			{
+				rst->push_back(record);
+				ids->push_back(id);
+				ret = 1;
+			}
+			else
+				ret = 0;
+		}
+
+		return ret;
 	}
+
+	vector<int>* _ = new vector<int>;
+	_ = recorder->select(tableName, conditions);
+	for(auto id: *_)
+	{
+		ids->push_back(id);
+		rst->push_back(recorder->getRecordById(id));
+	}
+
+	return ids->size();
 }
 
 vector<vector<tableValue>*> * systemAPI::select(string tableName, vector<Logic>* conditions)

@@ -20,6 +20,7 @@ public:
 	bool deleteTableInstance(string tableName,vector<int>*);                                //�Ȳ�ѯ����ɾ����  ���ԣ� ��һ������ά���滻�� ֱ��ɾ��..
 	bool defragmentation(string tableName);   //��Ƭ����
 	vector<int>* select(string tableName,vector<Logic>* conditions);                              //һ��condition������ѯ��
+	bool checkRecord(Table* table, vector<tableValue>* record, vector<Logic>* conditions);
 	vector<tableValue> * getRecordById(string tableName,int id);
 private:
 	catalogManager *catalog;
