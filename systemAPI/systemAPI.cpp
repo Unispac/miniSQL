@@ -60,6 +60,7 @@ int systemAPI::find(string tableName, vector<Logic>* conditions, vector<vector<t
 		
 	}
 }
+
 vector<vector<tableValue>*> * systemAPI::select(string tableName, vector<Logic>* conditions)
 {
 	// check tablename and conditions_op and conditions_attr
@@ -188,4 +189,9 @@ bool systemAPI::remove(string tableName, vector<Logic>* conditions)
 	vector<int> * selectId = recorder->select(tableName, conditions);
 	recorder->deleteTableInstance(tableName,selectId);
 	return true;
+}
+
+Table * systemAPI::getTable(string tableName)
+{
+	return catalog->getTable(tableName);
 }
