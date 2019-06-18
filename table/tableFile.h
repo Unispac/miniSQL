@@ -15,9 +15,11 @@ public:
 	~tableFile();
 	int insertRecord(vector<tableValue>* value);
 	bool deleteRecord(int id,bool commit=true);
-	vector<tableValue> * getRecord(int id);
+	vector<tableValue> * getRecord(int id, bool reportWhenNULL = true);
 	bool updateHeader();
 	int getBlockId(int recordId);
+	int getMaxId();
+	
 private:
 	int sizePerRecord;
 	int recordNumPerBlock;

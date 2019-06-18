@@ -16,10 +16,10 @@ public:
 	~recordManager();
 	bool createTable(string tableName);
 	bool dropTable(string tableName);
-	int insertTableInstance(string tableName, vector<tableValue>*); // Ã¿´ÎÖ»ÐèÒªÌí¼ÓÒ»Ìõ±íÏî£¬½«Öµ±íÁÐ³öÀ´¾ÍÐÐÁË¡£
-	bool deleteTableInstance(string tableName,vector<int>*);                                //ÏÈ²éÑ¯ÔÙ×öÉ¾³ý£¿  ²ßÂÔ£¿ ÓÃÒ»¸öÁ´±íÎ¬»¤Ìæ»»£¿ Ö±½ÓÉ¾£¿..
-	bool defragmentation(string tableName);   //ËéÆ¬ÕûÀí
-	vector<int>* select(string tableName,vector<Logic>*);                              //Ò»¸öcondition±í£¬²éÑ¯¡£
+	int insertTableInstance(string tableName, vector<tableValue>*); // Ã¿ï¿½ï¿½Ö»ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½î£¬ï¿½ï¿½Öµï¿½ï¿½ï¿½Ð³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë¡ï¿½
+	bool deleteTableInstance(string tableName,vector<int>*);                                //ï¿½È²ï¿½Ñ¯ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½ï¿½ï¿½  ï¿½ï¿½ï¿½Ô£ï¿½ ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î¬ï¿½ï¿½ï¿½æ»»ï¿½ï¿½ Ö±ï¿½ï¿½É¾ï¿½ï¿½..
+	bool defragmentation(string tableName);   //ï¿½ï¿½Æ¬ï¿½ï¿½ï¿½ï¿½
+	vector<int>* select(string tableName,vector<Logic>* conditions);                              //Ò»ï¿½ï¿½conditionï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¯ï¿½ï¿½
 	vector<tableValue> * getRecordById(string tableName,int id);
 private:
 	catalogManager *catalog;

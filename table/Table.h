@@ -49,7 +49,9 @@ public:
 	vector<string> * attributesHaveIndex;
 	Table(string tableName, vector<dbDataType*>*attr, vector<string> * index);
 	dbDataType* findAttrByName(string name);
+	int findPosByName(string name);
 	dbDataType* findAttrByName(const char* name);
+	int findPosByName(const char* name);
 };
 
 #endif // !Table_H

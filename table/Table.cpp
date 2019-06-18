@@ -27,7 +27,7 @@ Table::Table(string tableName, vector<dbDataType*>*attr, vector<string> * index)
 			errorHandler->reportErrorCode(ILLEGAL_DATA_TYPE);
 		}
 	}
-	sizePerInstance += 1; // Ã¿Ò»¸örecordµÄ¿ªÍ·ÊÇÒ»¸ö±ê¼Ç·ûºÅ£¬±ê¼ÇÕâÊÇ·ñÊÇÒ»¸ö¿ÕÎ»¡£
+	sizePerInstance += 1; // Ã¿Ò»ï¿½ï¿½recordï¿½Ä¿ï¿½Í·ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Å£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
 
 	if (sizePerInstance > blockSize)
 		errorHandler->reportErrorCode(INSTANCE_TOO_LARGE);
@@ -52,4 +52,20 @@ dbDataType* Table::findAttrByName(const char* name)
 {
 	string strname(name);
 	return findAttrByName(strname);
+}
+
+int Table::findPosByName(string name)
+{
+	for (int i = 0; i < attrList->size(); i++)
+	{
+		if ((*attrList)[i]->name == name)
+			return i;
+	}
+	return -1;	
+}
+
+int Table::findPosByName(const char* name)
+{
+	string strname(name);
+	return findPosByName(strname);
 }
