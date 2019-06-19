@@ -13,6 +13,12 @@
 
 extern errorReporter* errorHandler;
 
+
+indexManager::indexManager()
+{
+	buffer = new bufferManager();
+}
+
 void deleteFile(string filePath)
 {
 	remove(filePath.c_str());
@@ -65,5 +71,6 @@ bool indexManager::dropIndex(const char* indexName)
 {
 	string filePath = string("data/") + string("index/") + string(indexName) + string(".mdb");	
 	deleteFile(filePath);
+	buffer->clearBuffer();
 	return true;
 }

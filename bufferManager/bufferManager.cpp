@@ -127,9 +127,9 @@ Block * bufferManager::loadBlock(const string fileName,int id)
 
 bool bufferManager::deleteNode(bufferNode* x)
 {
-	delete x;
 	string nodeName = x->block->fileName + "_" + to_string(x->block->id);
 	nodeMap.erase(nodeName);
+	delete x;
 	blockCnt--;
 	return true;
 }
@@ -142,6 +142,16 @@ bool  bufferManager::appendBlock(const string fileName)
 	fwrite(data, blockSize, 1, file);
 	fclose(file);
 	delete data;
+	return true;
+}
+
+
+bool bufferManager::clearBuffer()
+{
+	while (pilarHead->next!=pilarTail)
+	{
+		if(!deleteNode(pilarHead->next))return false;
+	}
 	return true;
 }
 /*

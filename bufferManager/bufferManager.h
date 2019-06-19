@@ -34,6 +34,7 @@ public:
 	bool writeBlock(Block * block);
 	bool acessNode(bufferNode *node);
 	bool appendBlock(const string fileName);
+	bool clearBuffer();
 
 private:
 	static int blockCnt;

@@ -40,6 +40,7 @@ bool recordManager::createTable(string tableName)
 bool recordManager::dropTable(string tableName) // recorderֻ�������������.��ͷ��Ϣ��catalog�ܣ�������Ϣ��index�ܡ�
 {
 	string filePath = "data/" + tableName + ".mdb";
+	buffer->clearBuffer();
 	/*if (fopen(filePath.c_str(), "rb") == NULL)
 	{
 		errorHandler->reportErrorCode(NO_TABLE_TO_DROP);
