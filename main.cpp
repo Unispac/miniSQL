@@ -34,6 +34,12 @@ int main()
 
 	errorHandler = new errorReporter();
 	api = new systemAPI();
+
+	cout << endl << "Welcome to stupid-sql" << endl;
+
+	cout << endl << "-- Designed by Xiangyu Qi and Yuhan Wang" << endl;
+
+	cout << endl << "-- 拯救紫金港的可怜儿童" << endl << endl;
 	while (true)
 	{
 		Interpreter::Execute(Interpreter::CMD());

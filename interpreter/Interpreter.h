@@ -25,9 +25,18 @@ public:
 	static string CMD()
 	{
 		string x, y;
-		
+		int flag = false;
+		cout << endl;
 		while (true)
 		{
+			if (!flag)
+			{
+				cout << "stupid-sql ";
+				flag = true;
+			}
+			else
+				cout << "           ";
+
 			cout << ">> ";
 			getline(cin, y);
 			stringProcesser::trim(y);
