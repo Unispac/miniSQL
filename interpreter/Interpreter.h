@@ -14,6 +14,7 @@
 #include<interpreter\Select.h>
 #include<interpreter/deleteRecord.h>
 #include<table/Table.h>
+#include<fstream>
 using namespace std;
 
 extern systemAPI * api;
@@ -46,9 +47,32 @@ public:
 		return x;
 	}
 
-
+	
 	static void Execute(string x)
 	{
+		if (x.find("execfile") == 0)
+		{
+			x = x.substr(8);
+			stringProcesser::trim(x);
+			exeFile(x);
+			return;
+		}
+		else if (x.find("quit") == 0)
+		{
+			if (x.length() != 4)
+			{
+				syntaxError::Error();
+				return;
+			}
+			else
+			{
+				cout << "Good Bye!!" << endl;
+				exit(0);
+				return;
+			}
+		}
+
+
 		string y = x;
 		int head = x.find_first_of('(');
 
@@ -277,6 +301,47 @@ private:
 			cout << "[Done] "<<cnt<<" records have been deleted" << endl;
 		}
 		cout << endl;
+	}
+	static void exeFile(string path)
+	{
+		ifstream infile;
+		infile.open(path, ios::in);
+		if (infile.fail())
+		{
+			cout << endl;
+			cout << "[Failed] Can't find the target file : "<<path << endl;
+			cout << endl;
+			return;
+		}
+
+		string x, y;
+		x = "";
+		while (getline(infile,y))
+		{
+			stringProcesser::trim(y);
+			if (y.empty())continue;
+			x += y;
+			if (y[y.size() - 1] == ';')
+			{
+				int len = x.size();
+				for (int i = 0; i < len; i++)
+				{
+					if (x[i] >= 'A' && x[i] <= 'Z')x[i] += 32;
+					else if (x[i] == '	' || x[i] == '	')x[i] = ' ';
+				}
+				stringProcesser::trim(x);
+				x = x.substr(0, x.size() - 1);
+				stringProcesser::trim(x);
+				Execute(x);
+				x = "";
+			}
+		}
+		if (x != "")
+		{
+			cout << endl;
+			cout << "[Failed] Syntax Error!!" << endl;
+			cout << endl;
+		}
 	}
 };
 
