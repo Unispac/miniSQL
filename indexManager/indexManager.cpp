@@ -64,5 +64,6 @@ bool indexManager::createIndex(const char* indexName)
 bool indexManager::dropIndex(const char* indexName)
 {
 	string filePath = string("data/") + string("index/") + string(indexName) + string(".mdb");	
+	deleteFile(filePath);
 	return true;
 }
