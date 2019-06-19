@@ -69,3 +69,16 @@ int Table::findPosByName(const char* name)
 	string strname(name);
 	return findPosByName(strname);
 }
+
+void Table::dropIndex(string colName)
+{
+	dbDataType* attr = findAttrByName(colName);
+	attr->hasIndex = false;
+	int pos = 0;
+	for (pos = 0; pos < attributesHaveIndex->size(); pos++)
+	{
+		if (attributesHaveIndex->at(pos) == colName) break;
+	}
+	attributesHaveIndex->erase(attributesHaveIndex->begin() + pos);
+	return;
+}

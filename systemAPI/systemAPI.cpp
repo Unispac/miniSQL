@@ -28,6 +28,7 @@ systemAPI::~systemAPI()
 bool systemAPI::createTable(string tableName, vector<dbDataType*>*attr)
 {
 	if(!catalog->createTable(tableName, attr))return false;
+	if(!recorder->createTable(tableName))return false;
 	for (auto col : *attr)
 	{
 		if (col->primary)
@@ -36,7 +37,6 @@ bool systemAPI::createTable(string tableName, vector<dbDataType*>*attr)
 			break;
 		}
 	}
-	if(!recorder->createTable(tableName))return false;
 	return true;
 }
 
@@ -47,10 +47,10 @@ bool systemAPI::dropTable(string tableName)
 	{
 		Index* index = catalog->getIndexByTableCol(tableName, colName);
 		dropIndex(index->getName());
-		delete index;
 	}
 	if(!catalog->dropTable(tableName))return false;
 	if(!recorder->dropTable(tableName))return false;
+	
 	delete table;
 	return true;
 }
@@ -59,6 +59,17 @@ bool systemAPI::createIndex(string indexName, string tableName, string attrName)
 {
 	if (!catalog->createIndex(indexName, tableName, attrName)) return false;
 	if (!indexer->createIndex(indexName.c_str())) return false;
+	Table* table = catalog->getTable(tableName);
+	int pos = table->findPosByName(attrName);
+	dbDataType* attr = table->attrList->at(pos);
+	char* key = new char[attr->getKeyLength()];
+	vector<int>* ids = recorder->select(tableName, NULL);
+	for (int i = 0; i < ids->size(); i++)
+	{
+		vector<tableValue>* record = recorder->getRecordById(tableName, ids->at(i));
+		writeKey(attr, key, record->at(pos));
+		indexer->insert(indexName.c_str(), key, ids->at(i));
+	}
 	return true;
 }
 
@@ -147,7 +158,7 @@ vector<vector<tableValue>*> * systemAPI::select(string tableName, vector<Logic>*
 	return rst;
 }
 
-void writeKey(dbDataType* attr, char* key, tableValue v)
+void systemAPI::writeKey(dbDataType* attr, char* key, tableValue v)
 {
 	if (attr->dbType == DB_INT)
 		binaryFile::writeInt(key, v.INT);

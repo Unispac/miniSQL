@@ -60,6 +60,7 @@ private:
 	indexManager * indexer;
 
 	int find(string tableName, vector<Logic>* conditions, vector<vector<tableValue>*>* rst, vector<int>* ids);
+	void writeKey(dbDataType* attr, char* key, tableValue v);
 };
 
 #endif

@@ -52,6 +52,7 @@ public:
 	int findPosByName(string name);
 	dbDataType* findAttrByName(const char* name);
 	int findPosByName(const char* name);
+	void dropIndex(string colName);
 };
 
 #endif // !Table_H

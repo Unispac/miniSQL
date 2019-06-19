@@ -122,6 +122,8 @@ bool recordManager::checkRecord(Table* table, vector<tableValue>* record, vector
 // the validity of conditions is ensured in systemAPI
 vector<int>* recordManager::select(string tableName, vector<Logic>* conditions)                              //һ��condition������ѯ������һ����С����������кű��� ��������������
 {
+	if (conditions == NULL)
+		conditions = new vector<Logic>;
 	vector<int>* ret = new vector<int>;
 	Table* table = catalog->getTable(tableName);
 	tableFile* file = new tableFile(tableName);
@@ -133,6 +135,8 @@ vector<int>* recordManager::select(string tableName, vector<Logic>* conditions) 
 		if (checkRecord(table, record, conditions)) 
 			ret->push_back(i);
 	}
+	delete table;
+	delete file;
 	return ret;
 }
 
@@ -183,5 +187,7 @@ bool recordManager::checkDuplicate(string tableName, vector<tableValue>* record)
 		}
 		if (!noDuplicate) break;
 	}
+	delete table; 
+	delete file;
 	return noDuplicate;
 }
