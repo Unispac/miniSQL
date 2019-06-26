@@ -254,6 +254,14 @@ private:
 		else cout << "[Failed] Check again !!!" << endl;
 		cout << endl;
 	}
+
+	static string genStr(int len, string ch = " ")
+	{
+		string ret = "";
+		for (int i = 0; i < len; i++) ret += ch;
+		return ret;
+	}
+
 	static void selectResult(vector<vector<tableValue>*> *result,string tableName)
 	{
 		cout << endl;
@@ -264,39 +272,77 @@ private:
 			vector<dbDataType*> * attrList = table->attrList;
 			dbDataType * temp;
 			int size = attrList->size();
-			cout << tableName << "_schema(";
+			//cout << tableName << "_schema(";
+			int totLen = 1;
 			for (int i = 0; i < size; i++)
 			{
-				temp = (*attrList)[i];
-				cout << temp->name;
-				if(i!=size-1)cout<< " , ";
+				temp = attrList->at(i);
+				if (temp->dbType == DB_CHAR)
+					totLen += temp->getKeyLength() + 1;
+				else
+					totLen += temp->name.size() + 10 + 1;
+				//cout << temp->name;
+				//if(i!=size-1)cout<< " , ";
 			}
-			cout << ");";
-			cout << endl;
+			// cout << ");";
+			// cout << endl;
+			cout << genStr(totLen, "-") << endl;
+
 
 			int cnt = result->size();
 			vector<tableValue>* tempValue;
-	
+			cout << "|";
+			for (int i = 0; i < size; i++)
+			{
+				temp = attrList->at(i);
+				string name = temp->name;
+				int len;
+				if (temp->dbType == DB_CHAR)
+					len = temp->getKeyLength();
+				else
+					len = temp->name.size() + 10;
+				int right;
+				right = len - name.size();
+				cout << name << genStr(right) << "|";
+			}
+			cout << endl;
+			cout << genStr(totLen, "-") << endl;
+
 			for(int i=0;i<cnt;i++)
 			{
 				tempValue = (*result)[i];
+				cout << "|";
+				int left, right;
+				int v; float vf; char* vs;
 				for (int j = 0; j < size; j++)
 				{
 					temp = (*attrList)[j];
+					int len;
+					if (temp->dbType == DB_CHAR)
+						len = temp->getKeyLength();
+					else
+						len = temp->name.size() + 10;
 					switch (temp->dbType)
 					{
 					case DB_INT:
-						cout << (*tempValue)[j].INT << "   ";
+						v = tempValue->at(j).INT;
+						right = len - to_string(v).size();
+						cout << v << genStr(right) << "|";
 						break;
 					case DB_FLOAT:
-						cout << (*tempValue)[j].FLOAT << "   ";
+						vf = tempValue->at(j).FLOAT;
+						right = len - to_string(vf).size();
+						cout << vf << genStr(right) << "|";
 						break;
 					case DB_CHAR:
-						cout << (*tempValue)[j].CHAR << "   ";
+						vs = tempValue->at(j).CHAR;
+						right = len - strlen(vs);
+						cout << vs << genStr(right) << "|";
 						break;
 					}
 				}
 				cout << endl;
+				cout << genStr(totLen, "-") << endl;
 			}
 		}
 		cout << endl;
